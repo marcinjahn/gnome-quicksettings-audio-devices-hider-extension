@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+  <schema id="com.marcinjahn.exampleextension" path="/com/marcinjahn/exampleextension/">
+    <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
+    <key name="excluded-outputs" type="as">
+      <default>[]</default>
+    </key>
+    <key name="all-outputs" type="as">
+      <default>[]</default>
+    </key>
+  </schema>
+</schemalist>
