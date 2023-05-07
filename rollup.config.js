@@ -66,11 +66,8 @@ export default [
       }),
       copy({
         targets: [
-          { src: './resources/icons', dest: `${buildPath}` },
-          { src: './resources/images', dest: `${buildPath}` },
           { src: './resources/metadata.json', dest: `${buildPath}` },
           { src: './resources/schemas', dest: `${buildPath}` },
-          { src: './resources/dbus', dest: `${buildPath}` },
         ],
       }),
       cleanup({

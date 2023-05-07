@@ -108,12 +108,7 @@ class Extension {
     }
 
     updateAvailableOutputsInSettings(event: MixerEvent) {
-        const displayNames = this._mixer!.getAudioDevicesFromIds([event.deviceId]);
-
-        log(displayNames);
-        const displayName = displayNames[0].displayName;
-        
-        log(displayName);
+        const displayName = this._mixer!.getAudioDevicesFromIds([event.deviceId])[0].displayName;;
 
         if (event.type === 'output-added') {
             SettingsUtils.addToAvailableOutputs(displayName);

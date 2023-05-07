@@ -9,7 +9,6 @@ export class NewInstanceMixerSource {
         await waitForMixerToBeReady(mixer);
         await delay(200);
 
-        log(mixer.get_state());
         return new MixerWrapper(mixer, this.disposal(mixer))
     }
 

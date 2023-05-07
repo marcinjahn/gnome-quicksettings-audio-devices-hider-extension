@@ -10,13 +10,10 @@ export class MixerWrapper {
     constructor(private mixer: MixerControl, private disposal: () => void) {}
 
     getAudioDevicesFromIds(ids: number[]): AudioDevice[] {
-        log('getAudioDevicesFromIds');
-        log(ids);
         return ids.map(id => {
             const lookup = this.mixer.lookup_output_id(id);
-            const audioDevice = getAudioDevice(id, lookup?.get_description(), lookup?.get_origin());
-
-            return audioDevice;
+            
+            return getAudioDevice(id, lookup?.get_description(), lookup?.get_origin());
         });
     }
 
@@ -28,22 +25,14 @@ export class MixerWrapper {
      * undefined is returned in its place.
      */
     getAudioDevicesFromDisplayNames(displayNames: DisplayName[]): (AudioDevice | undefined)[] {
-        let dummyDevice = new MixerUIDevice();
+        const dummyDevice = new MixerUIDevice();
 
-        try {
-            const devices = this.getAudioDevicesFromIds(
-                range(dummyDevice.get_id()));
+        const devices = this.getAudioDevicesFromIds(
+            range(dummyDevice.get_id()));
 
-            return displayNames.map(
-                name => devices.find(
-                    device => {
-                        log(`${device.displayName} === ${name} is ${device.displayName === name}`);
-                        return device.displayName === name
-                    }));
-        }
-        finally {
-            dummyDevice.run_dispose();
-        }
+        return displayNames.map(
+            name => devices.find(
+                device => device.displayName === name));
     }
 
     subscribeToOutputChanges(callback: (event: MixerEvent) => void): MixerSubscription {

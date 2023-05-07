@@ -8,17 +8,11 @@ import {
 import { Switch, Align } from "@gi-types/gtk4";
 import { DisplayName } from "identification";
 
-function init() {
-    log('INIT CALLED')
-}
+function init() { }
 
 function fillPreferencesWindow(window: PreferencesWindow) {
-    log('fillPreferencesWindow CALLED')
     const page = new PreferencesPage();
     window.add(page);
-    
-    log(SettingsUtils.getAvailableOutputs().length);
-    log(SettingsUtils.getAvailableOutputs());
 
     const allDevices = SettingsUtils.getAvailableOutputs();
     const hiddenDevices = SettingsUtils.getExcludedOutputDeviceNames();
