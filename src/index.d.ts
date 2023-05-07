@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Actor, AnimationMode } from '@gi-types/clutter10';
-import { Settings } from '@gi-types/gio2';
-import {MixerControl} from '@gi-types/gvc1';
+import { Actor, AnimationMode } from "@gi-types/clutter10";
+import { Settings } from "@gi-types/gio2";
+import { MixerControl } from "@gi-types/gvc1";
 
 export {};
 
@@ -38,15 +38,19 @@ declare global {
       };
       status: {
         volume: {
-          getMixerControl() : MixerControl
-        }
-      }
+          getMixerControl(): MixerControl;
+        };
+      };
     };
     misc: {
       util: {
         wiggle(
           actor: Actor,
-          { offset, duration, wiggleCount }: { offset?: number; duration?: number; wiggleCount?: number },
+          {
+            offset,
+            duration,
+            wiggleCount,
+          }: { offset?: number; duration?: number; wiggleCount?: number }
         ): void;
       };
       extensionUtils: {
@@ -76,32 +80,32 @@ declare global {
 }
 
 type AnimatableActorFields =
-  | 'fixed_x'
-  | 'fixed_y'
-  | 'height'
-  | 'margin_bottom'
-  | 'margin_left'
-  | 'margin_right'
-  | 'margin_top'
-  | 'min_height'
-  | 'min_width'
-  | 'natural_height'
-  | 'natural_width'
-  | 'opacity'
-  | 'pivot_point_z'
-  | 'rotation_angle_x'
-  | 'rotation_angle_y'
-  | 'rotation_angle_z'
-  | 'scale_x'
-  | 'scale_y'
-  | 'scale_z'
-  | 'translation_x'
-  | 'translation_y'
-  | 'translation_z'
-  | 'width'
-  | 'x'
-  | 'y'
-  | 'z_position';
+  | "fixed_x"
+  | "fixed_y"
+  | "height"
+  | "margin_bottom"
+  | "margin_left"
+  | "margin_right"
+  | "margin_top"
+  | "min_height"
+  | "min_width"
+  | "natural_height"
+  | "natural_width"
+  | "opacity"
+  | "pivot_point_z"
+  | "rotation_angle_x"
+  | "rotation_angle_y"
+  | "rotation_angle_z"
+  | "scale_x"
+  | "scale_y"
+  | "scale_z"
+  | "translation_x"
+  | "translation_y"
+  | "translation_z"
+  | "width"
+  | "x"
+  | "y"
+  | "z_position";
 
 interface EasingParams {
   // milliseconds
@@ -116,21 +120,23 @@ interface EasingParams {
 }
 
 // Any number of extra fields for the properties to be animated (e.g. "opacity: 0").
-interface EasingParamsWithProperties extends EasingParams, Partial<Pick<Actor, AnimatableActorFields>> {}
+interface EasingParamsWithProperties
+  extends EasingParams,
+    Partial<Pick<Actor, AnimatableActorFields>> {}
 
-declare module '@gi-types/clutter10' {
+declare module "@gi-types/clutter10" {
   interface Actor {
     ease(params: EasingParamsWithProperties): void;
   }
 }
 
-declare module '@gi-types/st1' {
+declare module "@gi-types/st1" {
   interface Adjustment {
     ease(target: any, params: EasingParamsWithProperties): void;
   }
 }
 
-declare module '@gi-types/gobject2' {
+declare module "@gi-types/gobject2" {
   export interface MetaInfo {
     GTypeName: string;
     GTypeFlags?: TypeFlags;

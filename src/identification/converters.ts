@@ -8,15 +8,15 @@ import { DisplayName } from "./display-name";
  * @param device AudioDevice
  */
 export function getAudioDevice(
-    id: number, 
-    description: string | null, 
-    origin: string | null): AudioDevice 
-{
-    if (!description) description = 'unknown description';
-    if (!origin) origin = 'unknown origin';
+  id: number,
+  description: string | null,
+  origin: string | null
+): AudioDevice {
+  if (!description) description = "unknown description";
+  if (!origin) origin = "unknown origin";
 
-    return {
-        id,
-        displayName: `${description} – ${origin}`
-    };
+  return {
+    id,
+    displayName: `${description} – ${origin}`,
+  };
 }
