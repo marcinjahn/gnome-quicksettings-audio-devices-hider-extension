@@ -1,7 +1,6 @@
-import { AudioDevice } from "AudioDevice";
-import { getExcludedOutputDeviceIds, getAllOutputs } from "./settings";
-import { MixerWrapper } from "mixer";
-
+import { AudioDevice } from "./identification/audio-device.dto";
+import { Settings } from "./settings";
+import { NewInstanceMixerSource } from "./mixer";
 import {
     PreferencesPage,
     PreferencesGroup,
@@ -10,36 +9,36 @@ import {
 } from "@gi-types/adw1";
 import { Switch, Align } from "@gi-types/gtk4";
 
-function init() {}
+function init() {
+    log('INIT CALLED')
+}
 
 async function fillPreferencesWindow(window: PreferencesWindow) {
-    const mixer = new MixerWrapper();
-
-    const allDevicesPromise = mixer.getOutputDevicesInfo(getAllOutputs());
-    const hiddenDevicesPromise = mixer.getOutputDevicesInfo(
-        getExcludedOutputDeviceIds()
-    );
-
+    log('fillPreferencesWindow CALLED')
     const page = new PreferencesPage();
-
     window.add(page);
 
-    const group = new PreferencesGroup();
-    page.add(group);
+    const mixerSource = new NewInstanceMixerSource();
 
-    const [allDevices, hiddenDevices] = await Promise.all([
-        allDevicesPromise,
-        hiddenDevicesPromise,
-    ]);
+    var mixer = await mixerSource.getMixer();
+    
+    log(Settings.getAllOutputs().length);
+    log(Settings.getAllOutputs());
 
-    // const allDevices = [{id: 4, displayName: 'abc'}];
-    // const hiddenDevices: AudioDevice[] = [];
+    const allDevices = mixer.getAudioDevicesFromIds(
+        Settings.getAllOutputs());
+    const hiddenDevices = mixer.getAudioDevicesFromIds(
+        Settings.getExcludedOutputDeviceIds()
+    );
 
     mixer.dispose();
 
     var visibleDevices = allDevices.filter(
         (device) => !hiddenDevices.includes(device)
     );
+
+    const group = new PreferencesGroup();
+    page.add(group);
 
     visibleDevices.forEach((device) => {
         group.add(createDeviceRow(device, true));

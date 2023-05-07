@@ -4,30 +4,13 @@ import typescript from '@rollup/plugin-typescript';
 import cleanup from 'rollup-plugin-cleanup';
 import copy from 'rollup-plugin-copy';
 import styles from 'rollup-plugin-styles';
-import visualizer from 'rollup-plugin-visualizer';
 
 const buildPath = 'dist';
 
 const globals = {
-  '@gi-types/gdk4': 'imports.gi.Gdk',
-  '@gi-types/gio2': 'imports.gi.Gio',
   '@gi-types/gtk4': 'imports.gi.Gtk',
-  '@gi-types/gdkpixbuf2': 'imports.gi.GdkPixbuf',
-  '@gi-types/glib2': 'imports.gi.GLib',
-  '@gi-types/st1': 'imports.gi.St',
-  '@gi-types/shell0': 'imports.gi.Shell',
-  '@gi-types/meta10': 'imports.gi.Meta',
-  '@gi-types/clutter10': 'imports.gi.Clutter',
-  '@gi-types/soup3': 'imports.gi.Soup',
-  '@gi-types/gobject2': 'imports.gi.GObject',
-  '@gi-types/pango1': 'imports.gi.Pango',
-  '@gi-types/graphene1': 'imports.gi.Graphene',
-  '@imports/gda6': 'imports.gi.Gda',
-  '@imports/gsound1': 'imports.gi.GSound',
-  '@imports/cogl2': 'imports.gi.Cogl',
   '@gi-types/adw1': 'imports.gi.Adw',
   '@gi-types/gvc1': 'imports.gi.Gvc',
-  '@girs/gnome-shell': 'imports'
 };
 
 const external = [...Object.keys(globals)];
@@ -49,7 +32,10 @@ const prefsBanner = [
   'GIRepository.Repository.prepend_library_path(typelibDir);'
 ].join('\n');
 
-const prefsFooter = ['var init = prefs.init;', 'var fillPreferencesWindow = prefs.fillPreferencesWindow;'].join('\n');
+const prefsFooter = [
+  'var init = prefs.init;', 
+  'var fillPreferencesWindow = prefs.fillPreferencesWindow;'
+].join('\n');
 
 export default [
   {
@@ -61,8 +47,6 @@ export default [
       file: `${buildPath}/extension.js`,
       format: 'iife',
       name: 'init',
-      // banner: extensionBanner,
-      // footer: extensionFooter,
       exports: 'default',
       globals,
       assetFileNames: '[name][extname]',
