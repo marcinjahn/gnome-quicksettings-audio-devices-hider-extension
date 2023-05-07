@@ -5,10 +5,8 @@
   "main": "extension.js",
   "scripts": {
     "prepare": "husky install",
-    "clean:ts": "rm -rf ./dist",
-    "clean:schema": "rm -rf ./dist/schemas/*.compiled",
-    "lint": "eslint --ext .ts src/",
-    "build:app": "glib-compile-schemas resources/schemas/ && npm run clean:ts && rollup -c",
+    "clean": "rm -rf ./dist",
+    "build": "glib-compile-schemas resources/schemas/ && npm run clean:ts && rollup -c",
     "start:dev:wayland": "npm run build:app && dbus-run-session -- gnome-shell --nested --wayland",
     "linkdist": "ln -s \"$PWD/dist\" \"$HOME/.local/share/gnome-shell/extensions/quicksettings-audio-devices-hider@marcinjahn.com\"",
     "zip": "npm run build:app && rm -rf './dist/quicksettings-audio-devices-hider@marcinjahn.com.zip' && cd ./dist && zip -qr 'quicksettings-audio-devices-hider@marcinjahn.com.zip' .",
