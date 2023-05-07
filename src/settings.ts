@@ -1,6 +1,6 @@
 const ExtensionUtils = imports.misc.extensionUtils;
 
-export const SettingsPath = 'com.marcinjahn.exampleextension'
+export const SettingsPath = 'org.gnome.shell.extensions.quicksettings-audio-devices-hider'
 const ExcludedOutputsSetting = 'excluded-outputs';
 const AllOutputsSetting = 'all-outputs';
 

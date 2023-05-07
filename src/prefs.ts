@@ -21,6 +21,9 @@ async function fillPreferencesWindow(window: PreferencesWindow) {
     );
 
     const page = new PreferencesPage();
+
+    window.add(page);
+
     const group = new PreferencesGroup();
     page.add(group);
 
@@ -44,8 +47,6 @@ async function fillPreferencesWindow(window: PreferencesWindow) {
     hiddenDevices.forEach((device) => {
         group.add(createDeviceRow(device, false));
     });
-
-    window.add(page);
 }
 
 function createDeviceRow(device: AudioDevice, active: boolean): ActionRow {

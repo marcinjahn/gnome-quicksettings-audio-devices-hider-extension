@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="com.marcinjahn.exampleextension" path="/com/marcinjahn/exampleextension/">
+  <schema id="org.gnome.shell.extensions.quicksettings-audio-devices-hider" 
+          path="/org/gnome/shell/extensions/quicksettings-audio-devices-hider/">
     <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
     <key name="excluded-outputs" type="as">
       <default>[]</default>

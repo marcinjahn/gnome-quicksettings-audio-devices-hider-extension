@@ -1,7 +1,7 @@
 {
-  "name": "example-extension",
+  "name": "quicksettings-audio-devices-hider",
   "version": "1.0.0",
-  "description": "",
+  "description": "A Gnome Shell extension that allows you to hide selected devices from the Quick Settings audio devices panel",
   "main": "extension.js",
   "scripts": {
     "build": "npm run lock:types && npm run build:types && npm run build:ts && npm run gen:locale && npm run build:extension",
@@ -21,7 +21,8 @@
     "shell:restart": "busctl --user call org.gnome.Shell /io/elhan/Pano io.elhan.Pano restart",
     "build-and-restart": "npm run build && npm run shell:restart",
     "build:app": "glib-compile-schemas resources/schemas/ && npm run clean:ts && rollup -c",
-    "start:dev:wayland": "npm run build:app && dbus-run-session -- gnome-shell --nested --wayland"
+    "start:dev:wayland": "npm run build:app && dbus-run-session -- gnome-shell --nested --wayland",
+    "linkdist": "ln -s \"$PWD/dist\" \"$HOME/.local/share/gnome-shell/extensions/quicksettings-audio-devices-hider@marcinjahn.com\""
   },
   "author": "",
   "license": "ISC",
