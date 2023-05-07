@@ -21,7 +21,11 @@ function fillPreferencesWindow(window: PreferencesWindow) {
     (device) => !hiddenDevices.includes(device)
   );
 
-  const group = new PreferencesGroup();
+  const group = new PreferencesGroup({
+    title: "Output Audio Devices",
+    description:
+      "Choose which devices should be visible in the Quick Setting panel",
+  });
   page.add(group);
 
   visibleDevices.forEach((device) => {
