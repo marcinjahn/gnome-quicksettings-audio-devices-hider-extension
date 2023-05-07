@@ -81,7 +81,7 @@ class Extension {
 
     setupAllOutputsSubscription() {
         this._mixerSubscription = this._mixer!.subscribeToOutputChanges(
-            this.updateAvailableOutputsInSettings);
+            (e) => this.updateAvailableOutputsInSettings(e));
     }
 
     setAllOutputsInSettings() {
@@ -90,8 +90,6 @@ class Extension {
     }
 
     updateAvailableOutputsInSettings(event: MixerEvent) {
-        log('MIXER EVENT')
-        log(event.deviceId)
         const displayNames = this._mixer!.getAudioDevicesFromIds([event.deviceId]);
 
         log(displayNames);
