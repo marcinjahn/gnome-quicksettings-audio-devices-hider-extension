@@ -1,6 +1,4 @@
-import { AudioDevice } from "./identification/audio-device.dto";
-import { Settings } from "./settings";
-import { NewInstanceMixerSource } from "./mixer";
+import { SettingsUtils } from "./settings";
 import {
     PreferencesPage,
     PreferencesGroup,
@@ -8,30 +6,22 @@ import {
     PreferencesWindow,
 } from "@gi-types/adw1";
 import { Switch, Align } from "@gi-types/gtk4";
+import { DisplayName } from "identification";
 
 function init() {
     log('INIT CALLED')
 }
 
-async function fillPreferencesWindow(window: PreferencesWindow) {
+function fillPreferencesWindow(window: PreferencesWindow) {
     log('fillPreferencesWindow CALLED')
     const page = new PreferencesPage();
     window.add(page);
-
-    const mixerSource = new NewInstanceMixerSource();
-
-    var mixer = await mixerSource.getMixer();
     
-    log(Settings.getAllOutputs().length);
-    log(Settings.getAllOutputs());
+    log(SettingsUtils.getAvailableOutputs().length);
+    log(SettingsUtils.getAvailableOutputs());
 
-    const allDevices = mixer.getAudioDevicesFromIds(
-        Settings.getAllOutputs());
-    const hiddenDevices = mixer.getAudioDevicesFromIds(
-        Settings.getExcludedOutputDeviceIds()
-    );
-
-    mixer.dispose();
+    const allDevices = SettingsUtils.getAvailableOutputs();
+    const hiddenDevices = SettingsUtils.getExcludedOutputDeviceNames();
 
     var visibleDevices = allDevices.filter(
         (device) => !hiddenDevices.includes(device)
@@ -48,12 +38,22 @@ async function fillPreferencesWindow(window: PreferencesWindow) {
     });
 }
 
-function createDeviceRow(device: AudioDevice, active: boolean): ActionRow {
-    const row = new ActionRow({ title: device.displayName });
+function createDeviceRow(displayName: DisplayName, active: boolean): ActionRow {
+    const row = new ActionRow({ title: displayName });
 
     const toggle = new Switch({
         active,
         valign: Align.CENTER,
+    });
+
+    toggle.connect("state-set", (_, state) => {
+        if (state) {
+            SettingsUtils.removeFromExcludedOutputDeviceNames(displayName);
+        } else {
+            SettingsUtils.addToExcludedOutputDeviceNames(displayName);
+        }
+
+        return false;
     });
 
     row.add_suffix(toggle);

@@ -1,76 +1,108 @@
 import { MixerWrapper, MixerSubscription, AudioPanelMixerSource, MixerEvent } from './mixer';
-import { Settings } from './settings';
+import { ExcludedOutputNamesSetting, SettingsPath, SettingsUtils } from './settings';
 import { AudioPanel } from './audio-panel';
+import { Settings } from '@gi-types/gio2';
+import { DisplayName } from 'identification';
 
 const Main = imports.ui.main;
+const ExtensionUtils = imports.misc.extensionUtils;
 
 class Extension {
     private _uuid: string;
     private _mixer: MixerWrapper | null = null;
     private _mixerSubscription: MixerSubscription | null = null;
     private _audioPanel: AudioPanel;
+    private _settings: Settings;
+    private _settingsSubscription: number;
+    private _lastExludedDevices: DisplayName[];
 
     constructor(uuid: string) {
         this._uuid = uuid;
         this._audioPanel = new AudioPanel();
+        this._settings = ExtensionUtils.getSettings(SettingsPath);
+        this._lastExludedDevices = SettingsUtils.getExcludedOutputDeviceNames();
     }
 
     async enable() {
         log(`Enabling extension ${this._uuid}`);
-        log("--------------------------------------------------------ENABLING MY AWESOME EXTENSION------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        
+
         this._mixer = await new AudioPanelMixerSource().getMixer();
 
         this.setAllOutputsInSettings();
         this.setupAllOutputsSubscription();
-        this.setExcludedOutputIdsInSettings();
+        this.hideExludedDevices();
+        this.setupExludedDevicesHandling();
+    }
 
-        // const testDeviceId = allDisplayedDevices[0].id;
-        // log(testDeviceId);
-        // const info = MixerTools.getOutputDevicesInfo
-        // log(info);
-        // // listChildren(info);
-        // log(info?.description);
-        // log(info?.get_active_profile());
-        // log(info?.get_description());
-        // log(info?.get_origin());
-        // log(info?.get_port());
-        // log(info?.get_stream_id());
+    hideExludedDevices() {
+        var devices = this._mixer!.getAudioDevicesFromDisplayNames(this._lastExludedDevices);
+        devices.forEach(device => {
+            if (device) {
+                this._audioPanel.removeDevice(device!.id);
+            }
+        })
+    }
+
+    setupExludedDevicesHandling() {
+        this._settingsSubscription = this._settings.connect(
+            `changed::${ExcludedOutputNamesSetting}`, () => 
+        {
+            const newExcludedDevices = SettingsUtils.getExcludedOutputDeviceNames();
+
+            const devicesToShowIds = this.getDeviceIdsToShow(newExcludedDevices);
+            const devicesToHideIds = this.getDeviceIdsToHide(newExcludedDevices);
+
+            devicesToShowIds.forEach(id => this._audioPanel.addDevice(id));
+            devicesToHideIds.forEach(id => this._audioPanel.removeDevice(id));
+
+            this._lastExludedDevices = newExcludedDevices;
+        });
+    }
+
+    private getDeviceIdsToHide(newExcludedDevices: DisplayName[]) {
+        const devicesToHide = newExcludedDevices
+            .filter(current => !this._lastExludedDevices.includes(current));
+
+        const devicesToHideIds = this._mixer!.getAudioDevicesFromDisplayNames(devicesToHide)
+            .filter(n => n)
+            .map(n => n!.id);
+        return devicesToHideIds;
+    }
+
+    private getDeviceIdsToShow(newExcludedDevices: DisplayName[]) {
+        const devicesToShow = this._lastExludedDevices
+            .filter(last => !newExcludedDevices.includes(last));
+        const devicesToShowIds = this._mixer!.getAudioDevicesFromDisplayNames(devicesToShow)
+            .filter(n => n)
+            .map(n => n!.id);
+
+        return devicesToShowIds;
     }
 
     setupAllOutputsSubscription() {
         this._mixerSubscription = this._mixer!.subscribeToOutputChanges(
-            this.updateVisibleDevices);
+            this.updateAvailableOutputsInSettings);
     }
 
     setAllOutputsInSettings() {
         const allDisplayedDevices = this._audioPanel.getDisplayedDevices();
-        Settings.setAllOutputs(allDisplayedDevices.map(i => i.id));
+        SettingsUtils.setAvailableOutputs(allDisplayedDevices.map(i => i.displayName));
     }
 
-    setExcludedOutputIdsInSettings() {
-        const excludedNames = Settings.getExcludedOutputDeviceNames();
-        const excludedIds = this._mixer!.getAudioDevicesFromDisplayNames(excludedNames)
-            .filter(n => n)
-            .map(n => n!.id);
+    updateAvailableOutputsInSettings(event: MixerEvent) {
+        log('MIXER EVENT')
+        log(event.deviceId)
+        const displayNames = this._mixer!.getAudioDevicesFromIds([event.deviceId]);
 
-        Settings.setExcludedOutputDeviceIds(excludedIds);
-    }
+        log(displayNames);
+        const displayName = displayNames[0].displayName;
+        
+        log(displayName);
 
-    logDevice(id: number, event: string) {
-        log('DEVICE ' + event + " " + id);
-    }
-
-    updateVisibleDevices(event: MixerEvent) {
         if (event.type === 'output-added') {
-            Settings.addToAllOutputs(event.deviceId);
+            SettingsUtils.addToAvailableOutputs(displayName);
         } else if (event.type === 'output-removed') {
-            Settings.removeFromAllOutputs(event.deviceId);
+            SettingsUtils.removeFromAvailableOutputs(displayName);
         } else {
             log(`WARN: Received an unsupported MixerEvent: ${event.type}`);
         }
@@ -78,13 +110,7 @@ class Extension {
 
     disable() {
         log(`Disabling extension ${this._uuid}`);
-        log("--------------------------------------------------------DISABLNG MY AWESOME EXTENSION------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-        log("--------------------------------------------------------------------------------------------------------------------------------------------------");
-    
+
         if (this._mixerSubscription) {
             this._mixer!.unsubscribe(this._mixerSubscription);
         }
@@ -92,41 +118,21 @@ class Extension {
             this._mixer!.dispose();
         }
 
+        this._settings.disconnect(this._settingsSubscription);
+
+        this.enableAllDevices();
+    }
+
+    enableAllDevices() {
+        const allDevices = SettingsUtils.getAvailableOutputs();
+        const devicesToShowIds = this._mixer!.getAudioDevicesFromDisplayNames(allDevices)
+            .filter(n => n)
+            .map(n => n!.id);
+        
+        devicesToShowIds.forEach(id => this._audioPanel.addDevice(id));
     }
 }
 
 export default function (meta: { uuid: string }): Extension {
     return new Extension(meta.uuid);
 }
-
-function listChildren(obj: any) {
-    const klass = obj?.constructor?.name
-    log(klass);
-
-    if (klass === "Map") {
-        log("It's a map");
-        obj.forEach((value, key) => {
-            log(`Key: ${key}, Value: ${value}`);
-        });
-
-        return;
-    }
-
-    // Get an array of property and method names
-    const propertiesAndMethods = Object.getOwnPropertyNames(obj);
-
-    log(propertiesAndMethods.length);
-  
-    // Sort the array alphabetically
-    propertiesAndMethods.sort();
-  
-    // Iterate through the sorted array
-    propertiesAndMethods.forEach((property) => {
-      // Check if the property is a function (method)
-      if (typeof obj[property] === 'function') {
-        log(property + '()');
-      } else {
-        log(property);
-      }
-    });
-  }

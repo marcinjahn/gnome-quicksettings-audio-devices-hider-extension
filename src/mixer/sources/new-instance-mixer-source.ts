@@ -23,6 +23,5 @@ export class NewInstanceMixerSource {
 
     disposal = (mixer: MixerControl) => () => {
         mixer.close();
-        mixer.run_dispose();
     }
 }

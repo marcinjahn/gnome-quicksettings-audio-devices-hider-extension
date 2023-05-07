@@ -11,6 +11,7 @@ const globals = {
   '@gi-types/gtk4': 'imports.gi.Gtk',
   '@gi-types/adw1': 'imports.gi.Adw',
   '@gi-types/gvc1': 'imports.gi.Gvc',
+  '@gi-types/gio2': 'imports.gi.Gio'
 };
 
 const external = [...Object.keys(globals)];

@@ -4,6 +4,7 @@ import { DisplayName } from "./display-name";
 /**
  * Display name format copied from
  * https://gitlab.gnome.org/GNOME/gnome-shell/-/blob/main/js/ui/status/volume.js#L132
+ * The "-" is U+2013 on purpose
  * @param device AudioDevice
  */
 export function getAudioDevice(
@@ -16,6 +17,6 @@ export function getAudioDevice(
 
     return {
         id,
-        displayName: `${description} - ${origin}`
+        displayName: `${description} – ${origin}`
     };
 }

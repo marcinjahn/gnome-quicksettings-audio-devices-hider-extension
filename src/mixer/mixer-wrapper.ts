@@ -9,16 +9,19 @@ import { DisplayName } from 'identification/display-name';
 export class MixerWrapper {    
     constructor(private mixer: MixerControl, private disposal: () => void) {}
 
-    getAudioDevicesFromIds(ids: number[]): AudioDevice[] {    
+    getAudioDevicesFromIds(ids: number[]): AudioDevice[] {
+        log('getAudioDevicesFromIds');
+        log(ids);
         return ids.map(id => {
             const lookup = this.mixer.lookup_output_id(id);
-            console.log(lookup);
-            return getAudioDevice(id, lookup?.get_description(), lookup?.get_origin());
+            const audioDevice = getAudioDevice(id, lookup?.get_description(), lookup?.get_origin());
+
+            return audioDevice;
         });
     }
 
     /**
-     * Uses a Dummy Devcie "trick" from 
+     * Uses a Dummy Device "trick" from 
      * https://github.com/kgshank/gse-sound-output-device-chooser/blob/master/sound-output-device-chooser@kgshank.net/base.js#LL299C20-L299C20
      * @param displayNames display names
      * @returns A list of matching audio devices. If a given display name is not found, 
@@ -33,7 +36,10 @@ export class MixerWrapper {
 
             return displayNames.map(
                 name => devices.find(
-                    device => device.displayName === name));
+                    device => {
+                        log(`${device.displayName} === ${name} is ${device.displayName === name}`);
+                        return device.displayName === name
+                    }));
         }
         finally {
             dummyDevice.run_dispose();

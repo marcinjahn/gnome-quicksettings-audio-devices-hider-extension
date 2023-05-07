@@ -7,13 +7,9 @@
       <default>[]</default>
       <description>Display names of audio outputs that should be hidden from the Gnome's Quick Settings output audio devices panel. It's persistent across reloads of the extensions</description>
     </key>
-    <key name="excluded-output-ids" type="as">
+    <key name="available-output-names" type="as">
       <default>[]</default>
-      <description>IDs of audio outputs that should be hidden from the Gnome's Quick Settings output audio devices panel. It's refreshed every time extension is enabled.</description>
-    </key>
-    <key name="all-output-ids" type="as">
-      <default>[]</default>
-      <description>IDs of all output devices that would normally be displayed in Gnome's Quick Settings output audio devices panel. It's refreshed every time extension is enabled.</description>
+      <description>Display names of all output devices that would normally be displayed in Gnome's Quick Settings output audio devices panel. It's refreshed every time extension is enabled.</description>
     </key>
   </schema>
 </schemalist>
