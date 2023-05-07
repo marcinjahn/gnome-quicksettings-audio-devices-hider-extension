@@ -7,9 +7,9 @@
     "prepare": "husky install",
     "clean": "rm -rf ./dist",
     "build": "glib-compile-schemas resources/schemas/ && npm run clean && rollup -c",
-    "start:dev:wayland": "npm run build:app && dbus-run-session -- gnome-shell --nested --wayland",
+    "start:dev:wayland": "npm run build && dbus-run-session -- gnome-shell --nested --wayland",
     "linkdist": "ln -s \"$PWD/dist\" \"$HOME/.local/share/gnome-shell/extensions/quicksettings-audio-devices-hider@marcinjahn.com\"",
-    "zip": "npm run build:app && rm -rf './dist/quicksettings-audio-devices-hider@marcinjahn.com.zip' && cd ./dist && zip -qr 'quicksettings-audio-devices-hider@marcinjahn.com.zip' .",
+    "zip": "npm run build && rm -rf './dist/quicksettings-audio-devices-hider@marcinjahn.com.zip' && cd ./dist && zip -qr 'quicksettings-audio-devices-hider@marcinjahn.com.zip' .",
     "bump-version": "./scripts/bump-version.sh",
     "log:extension": "journalctl -f -o cat GNOME_SHELL_EXTENSION_UUID=quicksettings-audio-devices-hider@marcinjahn.com",
     "log:prefs": "journalctl -f -o cat /usr/bin/gjs"
