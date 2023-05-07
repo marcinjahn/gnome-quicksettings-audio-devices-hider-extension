@@ -16,22 +16,6 @@ const globals = {
 
 const external = [...Object.keys(globals)];
 
-const prefsBanner = [
-  "const GIRepository = imports.gi.GIRepository;",
-  "const GLib = imports.gi.GLib;",
-  "let libdir = GIRepository.Repository.get_search_path().find(path => {",
-  '  return path.endsWith("/gjs/girepository-1.0");',
-  '}).replace("/gjs/girepository-1.0", "");',
-  'const gsdir = GLib.build_filenamev([libdir, "gnome-shell"]);',
-  "if (!GLib.file_test(gsdir, GLib.FileTest.IS_DIR)) {",
-  "  const currentDir = `/${GLib.path_get_basename(libdir)}`;",
-  '  libdir = libdir.replace(currentDir, "");',
-  "}",
-  'const typelibDir = GLib.build_filenamev([libdir, "gnome-shell"]);',
-  "GIRepository.Repository.prepend_search_path(typelibDir);",
-  "GIRepository.Repository.prepend_library_path(typelibDir);",
-].join("\n");
-
 const prefsFooter = [
   "var init = prefs.init;",
   "var fillPreferencesWindow = prefs.fillPreferencesWindow;",
@@ -82,7 +66,6 @@ export default [
       exports: "default",
       name: "prefs",
       globals,
-      banner: prefsBanner,
       footer: prefsFooter,
     },
     treeshake: {

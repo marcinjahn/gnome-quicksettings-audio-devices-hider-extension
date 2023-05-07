@@ -18,23 +18,24 @@ import {
 const ExtensionUtils = imports.misc.extensionUtils;
 
 class Extension {
-  private _uuid: string;
-  private _mixer: MixerWrapper | null = null;
-  private _mixerSubscription: MixerSubscription | null = null;
-  private _audioPanel: AudioPanel;
-  private _settings: Settings;
-  private _settingsSubscription: number;
-  private _lastExludedDevices: DisplayName[];
+  private _uuid: string | null;
+  private _mixer: MixerWrapper | null;
+  private _mixerSubscription: MixerSubscription | null;
+  private _audioPanel: AudioPanel | null;
+  private _settings: Settings | null;
+  private _settingsSubscription: number | null;
+  private _lastExludedDevices: DisplayName[] | null;
 
   constructor(uuid: string) {
     this._uuid = uuid;
-    this._audioPanel = new AudioPanel();
-    this._settings = ExtensionUtils.getSettings(SettingsPath);
-    this._lastExludedDevices = SettingsUtils.getExcludedOutputDeviceNames();
   }
 
   async enable() {
     log(`Enabling extension ${this._uuid}`);
+
+    this._audioPanel = new AudioPanel();
+    this._settings = ExtensionUtils.getSettings(SettingsPath);
+    this._lastExludedDevices = SettingsUtils.getExcludedOutputDeviceNames();
 
     this._mixer = await new AudioPanelMixerSource().getMixer();
 
@@ -46,17 +47,17 @@ class Extension {
 
   hideExcludedDevices() {
     var devices = this._mixer!.getAudioDevicesFromDisplayNames(
-      this._lastExludedDevices
+      this._lastExludedDevices!
     );
     devices.forEach((device) => {
       if (device) {
-        this._audioPanel.removeDevice(device!.id);
+        this._audioPanel!.removeDevice(device!.id);
       }
     });
   }
 
   setupExludedDevicesHandling() {
-    this._settingsSubscription = this._settings.connect(
+    this._settingsSubscription = this._settings!.connect(
       `changed::${ExcludedOutputNamesSetting}`,
       () => {
         const newExcludedDevices = SettingsUtils.getExcludedOutputDeviceNames();
@@ -64,8 +65,8 @@ class Extension {
         const devicesToShowIds = this.getDeviceIdsToShow(newExcludedDevices);
         const devicesToHideIds = this.getDeviceIdsToHide(newExcludedDevices);
 
-        devicesToShowIds.forEach((id) => this._audioPanel.addDevice(id));
-        devicesToHideIds.forEach((id) => this._audioPanel.removeDevice(id));
+        devicesToShowIds.forEach((id) => this._audioPanel!.addDevice(id));
+        devicesToHideIds.forEach((id) => this._audioPanel!.removeDevice(id));
 
         this._lastExludedDevices = newExcludedDevices;
       }
@@ -74,7 +75,7 @@ class Extension {
 
   private getDeviceIdsToHide(newExcludedDevices: DisplayName[]) {
     const devicesToHide = newExcludedDevices.filter(
-      (current) => !this._lastExludedDevices.includes(current)
+      (current) => !this._lastExludedDevices!.includes(current)
     );
 
     const devicesToHideIds = this._mixer!.getAudioDevicesFromDisplayNames(
@@ -86,7 +87,7 @@ class Extension {
   }
 
   private getDeviceIdsToShow(newExcludedDevices: DisplayName[]) {
-    const devicesToShow = this._lastExludedDevices.filter(
+    const devicesToShow = this._lastExludedDevices!.filter(
       (last) => !newExcludedDevices.includes(last)
     );
     const devicesToShowIds = this._mixer!.getAudioDevicesFromDisplayNames(
@@ -116,13 +117,13 @@ class Extension {
     if (excludedOutputs.includes(deviceName)) {
       delay(200).then(() => {
         // delay due to potential race condition with Quick Setting panel's code
-        this._audioPanel.removeDevice(deviceId);
+        this._audioPanel!.removeDevice(deviceId);
       });
     }
   }
 
   setAllOutputsInSettings() {
-    const allDisplayedDevices = this._audioPanel.getDisplayedDevices();
+    const allDisplayedDevices = this._audioPanel!.getDisplayedDevices();
     SettingsUtils.setAvailableOutputs(
       allDisplayedDevices.map((i) => i.displayName)
     );
@@ -151,9 +152,16 @@ class Extension {
       this._mixer!.dispose();
     }
 
-    this._settings.disconnect(this._settingsSubscription);
+    this._settings!.disconnect(this._settingsSubscription!);
 
     this.enableAllDevices();
+
+    this._audioPanel = null;
+    this._lastExludedDevices = null;
+    this._mixer = null;
+    this._mixerSubscription = null;
+    this._settingsSubscription = null;
+    this._uuid = null;
   }
 
   enableAllDevices() {
@@ -164,7 +172,7 @@ class Extension {
       .filter((n) => n)
       .map((n) => n!.id);
 
-    devicesToShowIds.forEach((id) => this._audioPanel.addDevice(id));
+    devicesToShowIds.forEach((id) => this._audioPanel!.addDevice(id));
   }
 }
 

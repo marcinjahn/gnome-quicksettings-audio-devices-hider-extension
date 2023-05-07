@@ -1,3 +1,4 @@
+import { Settings } from "@gi-types/gio2";
 import { DisplayName } from "identification/display-name";
 
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -9,15 +10,25 @@ export const ExcludedOutputNamesSetting = "excluded-output-names";
 const AvailableOutputNames = "available-output-names";
 
 export class SettingsUtils {
+  private static settings: Settings | null = null;
+
+  private static getSettings(): Settings {
+    if (!this.settings) {
+      this.settings = ExtensionUtils.getSettings(SettingsPath);
+    }
+
+    return this.settings;
+  }
+
   static getExcludedOutputDeviceNames(): DisplayName[] {
-    const settings = ExtensionUtils.getSettings(SettingsPath);
+    const settings = this.getSettings();
     const ids = settings.get_strv(ExcludedOutputNamesSetting);
 
     return ids;
   }
 
   static setExcludedOutputDeviceNames(displayNames: DisplayName[]) {
-    const settings = ExtensionUtils.getSettings(SettingsPath);
+    const settings = this.getSettings();
     settings.set_strv(ExcludedOutputNamesSetting, displayNames);
   }
 
@@ -29,10 +40,7 @@ export class SettingsUtils {
     }
 
     const newOutputs = [...currentOutputs, displayName];
-
-    const settings = ExtensionUtils.getSettings(SettingsPath);
-
-    log("Setting " + newOutputs);
+    const settings = this.getSettings();
 
     settings.set_strv(ExcludedOutputNamesSetting, newOutputs);
   }
@@ -48,19 +56,19 @@ export class SettingsUtils {
 
     outputs.splice(index, 1);
 
-    const settings = ExtensionUtils.getSettings(SettingsPath);
+    const settings = this.getSettings();
     settings.set_strv(ExcludedOutputNamesSetting, outputs);
   }
 
   static getAvailableOutputs(): DisplayName[] {
-    const settings = ExtensionUtils.getSettings(SettingsPath);
+    const settings = this.getSettings();
     const ids = settings.get_strv(AvailableOutputNames);
 
     return ids;
   }
 
   static setAvailableOutputs(displayNames: DisplayName[]) {
-    const settings = ExtensionUtils.getSettings(SettingsPath);
+    const settings = this.getSettings();
     settings.set_strv(
       AvailableOutputNames,
       displayNames.map((id) => id.toString())
@@ -76,7 +84,7 @@ export class SettingsUtils {
 
     const newAllOutputs = [...currentOutputs, displayName];
 
-    const settings = ExtensionUtils.getSettings(SettingsPath);
+    const settings = this.getSettings();
     settings.set_strv(
       AvailableOutputNames,
       newAllOutputs.map((id) => id.toString())
@@ -94,7 +102,7 @@ export class SettingsUtils {
 
     outputs.splice(index, 1);
 
-    const settings = ExtensionUtils.getSettings(SettingsPath);
+    const settings = this.getSettings();
     settings.set_strv(
       AvailableOutputNames,
       outputs.map((id) => id.toString())
