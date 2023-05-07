@@ -1,8 +1,10 @@
 {
   "name": "Quick Settings Audio Devices Hider",
-  "description": "A Gnome Shell extension that allows you to hide selected devices from the Quick Settings audio devices panel",
+  "description": "A Gnome Shell extension that allows you to hide selected devices from the Quick Settings audio devices panel.\nThanks to it, your Quick Settings panel will list only those devices that you actually use making it easier to quickly switch between them.",
   "uuid": "quicksettings-audio-devices-hider@marcinjahn.com",
   "shell-version": [
     "44"
-  ]
+  ],
+  "url": "https://github.com/marcinjahn/gnome-quicksettings-audio-devices-hider-extension",
+  "version": 1
 }
