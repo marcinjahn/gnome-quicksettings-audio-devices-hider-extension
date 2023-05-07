@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { Actor, AnimationMode } from "@gi-types/clutter10";
 import { Settings } from "@gi-types/gio2";
 import { MixerControl } from "@gi-types/gvc1";
 
@@ -45,7 +44,7 @@ declare global {
     misc: {
       util: {
         wiggle(
-          actor: Actor,
+          actor: any,
           {
             offset,
             duration,
@@ -112,7 +111,7 @@ interface EasingParams {
   duration: number;
   // milliseconds
   delay?: number;
-  mode?: AnimationMode;
+  mode?: any;
   repeatCount?: number;
   autoReverse?: boolean;
   onComplete?: () => void;
@@ -122,7 +121,7 @@ interface EasingParams {
 // Any number of extra fields for the properties to be animated (e.g. "opacity: 0").
 interface EasingParamsWithProperties
   extends EasingParams,
-    Partial<Pick<Actor, AnimatableActorFields>> {}
+    Partial<Pick<any, AnimatableActorFields>> {}
 
 declare module "@gi-types/clutter10" {
   interface Actor {

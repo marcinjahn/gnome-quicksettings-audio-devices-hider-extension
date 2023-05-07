@@ -1,5 +1,4 @@
 import { AudioDevice } from "./audio-device.dto";
-import { DisplayName } from "./display-name";
 
 /**
  * Display name format copied from

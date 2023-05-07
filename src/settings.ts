@@ -9,18 +9,6 @@ export const ExcludedOutputNamesSetting = "excluded-output-names";
 const AvailableOutputNames = "available-output-names";
 
 export class SettingsUtils {
-  // static getExcludedOutputDeviceIds(): number[] {
-  //     const settings = ExtensionUtils.getSettings(SettingsPath);
-  //     const ids = settings.get_strv(ExcludedOutputIdsSetting);
-
-  //     return ids.map(id => parseInt(id));
-  // }
-
-  // static setExcludedOutputDeviceIds(ids: number[]) {
-  //     const settings = ExtensionUtils.getSettings(SettingsPath);
-  //     settings.set_strv(ExcludedOutputIdsSetting, ids.map(id => id.toString()));
-  // }
-
   static getExcludedOutputDeviceNames(): DisplayName[] {
     const settings = ExtensionUtils.getSettings(SettingsPath);
     const ids = settings.get_strv(ExcludedOutputNamesSetting);

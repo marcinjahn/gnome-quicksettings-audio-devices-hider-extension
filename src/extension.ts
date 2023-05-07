@@ -158,7 +158,6 @@ class Extension {
 
   enableAllDevices() {
     const allDevices = SettingsUtils.getAvailableOutputs();
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const devicesToShowIds = this._mixer!.getAudioDevicesFromDisplayNames(
       allDevices
     )
