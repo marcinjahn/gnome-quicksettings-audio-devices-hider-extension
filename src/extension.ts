@@ -3,6 +3,7 @@ import { ExcludedOutputNamesSetting, SettingsPath, SettingsUtils } from './setti
 import { AudioPanel } from './audio-panel';
 import { Settings } from '@gi-types/gio2';
 import { DisplayName } from 'identification';
+import { delay } from 'utils/delay';
 
 const Main = imports.ui.main;
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -29,12 +30,12 @@ class Extension {
         this._mixer = await new AudioPanelMixerSource().getMixer();
 
         this.setAllOutputsInSettings();
-        this.setupAllOutputsSubscription();
-        this.hideExludedDevices();
+        this.setupOutputChangesSubscription();
+        this.hideExcludedDevices();
         this.setupExludedDevicesHandling();
     }
 
-    hideExludedDevices() {
+    hideExcludedDevices() {
         var devices = this._mixer!.getAudioDevicesFromDisplayNames(this._lastExludedDevices);
         devices.forEach(device => {
             if (device) {
@@ -79,9 +80,26 @@ class Extension {
         return devicesToShowIds;
     }
 
-    setupAllOutputsSubscription() {
-        this._mixerSubscription = this._mixer!.subscribeToOutputChanges(
-            (e) => this.updateAvailableOutputsInSettings(e));
+    setupOutputChangesSubscription() {
+        this._mixerSubscription = this._mixer!.subscribeToOutputChanges(event => {
+                this.updateAvailableOutputsInSettings(event);
+
+                if (event.type === 'output-added') {
+                    this.hideDeviceIfExcluded(event.deviceId);
+                }
+            });
+    }
+
+    hideDeviceIfExcluded(deviceId: number) {
+        const deviceName = this._mixer!.getAudioDevicesFromIds([deviceId])[0].displayName;
+        const excludedOutputs = SettingsUtils.getExcludedOutputDeviceNames();
+        
+        if (excludedOutputs.includes(deviceName)) {
+            delay(200).then(() => {
+                // delay due to potential race condition with Quick Setting panel's code
+                this._audioPanel.removeDevice(deviceId);
+            });
+        }
     }
 
     setAllOutputsInSettings() {
