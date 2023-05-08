@@ -14,8 +14,15 @@ function fillPreferencesWindow(window: PreferencesWindow) {
   const page = new PreferencesPage();
   window.add(page);
 
-  const allDevices = SettingsUtils.getAvailableOutputs();
-  const hiddenDevices = SettingsUtils.getExcludedOutputDeviceNames();
+  let settings: SettingsUtils | null = new SettingsUtils();
+
+  window.connect("close-request", () => {
+    settings?.dispose();
+    settings = null;
+  });
+
+  const allDevices = settings.getAvailableOutputs();
+  const hiddenDevices = settings.getExcludedOutputDeviceNames();
 
   var visibleDevices = allDevices.filter(
     (device) => !hiddenDevices.includes(device)
@@ -29,14 +36,18 @@ function fillPreferencesWindow(window: PreferencesWindow) {
   page.add(group);
 
   visibleDevices.forEach((device) => {
-    group.add(createDeviceRow(device, true));
+    group.add(createDeviceRow(device, true, settings!));
   });
   hiddenDevices.forEach((device) => {
-    group.add(createDeviceRow(device, false));
+    group.add(createDeviceRow(device, false, settings!));
   });
 }
 
-function createDeviceRow(displayName: DisplayName, active: boolean): ActionRow {
+function createDeviceRow(
+  displayName: DisplayName,
+  active: boolean,
+  settings: SettingsUtils
+): ActionRow {
   const row = new ActionRow({ title: displayName });
 
   const toggle = new Switch({
@@ -46,9 +57,9 @@ function createDeviceRow(displayName: DisplayName, active: boolean): ActionRow {
 
   toggle.connect("state-set", (_, state) => {
     if (state) {
-      SettingsUtils.removeFromExcludedOutputDeviceNames(displayName);
+      settings.removeFromExcludedOutputDeviceNames(displayName);
     } else {
-      SettingsUtils.addToExcludedOutputDeviceNames(displayName);
+      settings.addToExcludedOutputDeviceNames(displayName);
     }
 
     return false;

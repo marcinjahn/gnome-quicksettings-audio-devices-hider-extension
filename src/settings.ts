@@ -3,16 +3,16 @@ import { DisplayName } from "identification/display-name";
 
 const ExtensionUtils = imports.misc.extensionUtils;
 
-export const SettingsPath =
+const SettingsPath =
   "org.gnome.shell.extensions.quicksettings-audio-devices-hider";
 
 export const ExcludedOutputNamesSetting = "excluded-output-names";
 const AvailableOutputNames = "available-output-names";
 
 export class SettingsUtils {
-  private static settings: Settings | null = null;
+  private settings: Settings | null = null;
 
-  private static getSettings(): Settings {
+  private getSettings(): Settings {
     if (!this.settings) {
       this.settings = ExtensionUtils.getSettings(SettingsPath);
     }
@@ -20,20 +20,20 @@ export class SettingsUtils {
     return this.settings;
   }
 
-  static getExcludedOutputDeviceNames(): DisplayName[] {
+  getExcludedOutputDeviceNames(): DisplayName[] {
     const settings = this.getSettings();
     const ids = settings.get_strv(ExcludedOutputNamesSetting);
 
     return ids;
   }
 
-  static setExcludedOutputDeviceNames(displayNames: DisplayName[]) {
+  setExcludedOutputDeviceNames(displayNames: DisplayName[]) {
     const settings = this.getSettings();
     settings.set_strv(ExcludedOutputNamesSetting, displayNames);
   }
 
-  static addToExcludedOutputDeviceNames(displayName: DisplayName) {
-    const currentOutputs = SettingsUtils.getExcludedOutputDeviceNames();
+  addToExcludedOutputDeviceNames(displayName: DisplayName) {
+    const currentOutputs = this.getExcludedOutputDeviceNames();
 
     if (currentOutputs.includes(displayName)) {
       return;
@@ -45,8 +45,8 @@ export class SettingsUtils {
     settings.set_strv(ExcludedOutputNamesSetting, newOutputs);
   }
 
-  static removeFromExcludedOutputDeviceNames(displayName: DisplayName) {
-    const outputs = SettingsUtils.getExcludedOutputDeviceNames();
+  removeFromExcludedOutputDeviceNames(displayName: DisplayName) {
+    const outputs = this.getExcludedOutputDeviceNames();
 
     const index = outputs.indexOf(displayName);
 
@@ -60,14 +60,14 @@ export class SettingsUtils {
     settings.set_strv(ExcludedOutputNamesSetting, outputs);
   }
 
-  static getAvailableOutputs(): DisplayName[] {
+  getAvailableOutputs(): DisplayName[] {
     const settings = this.getSettings();
     const ids = settings.get_strv(AvailableOutputNames);
 
     return ids;
   }
 
-  static setAvailableOutputs(displayNames: DisplayName[]) {
+  setAvailableOutputs(displayNames: DisplayName[]) {
     const settings = this.getSettings();
     settings.set_strv(
       AvailableOutputNames,
@@ -75,8 +75,8 @@ export class SettingsUtils {
     );
   }
 
-  static addToAvailableOutputs(displayName: DisplayName) {
-    const currentOutputs = SettingsUtils.getAvailableOutputs();
+  addToAvailableOutputs(displayName: DisplayName) {
+    const currentOutputs = this.getAvailableOutputs();
 
     if (currentOutputs.includes(displayName)) {
       return;
@@ -91,8 +91,8 @@ export class SettingsUtils {
     );
   }
 
-  static removeFromAvailableOutputs(displayName: DisplayName) {
-    const outputs = SettingsUtils.getAvailableOutputs();
+  removeFromAvailableOutputs(displayName: DisplayName) {
+    const outputs = this.getAvailableOutputs();
 
     const index = outputs.indexOf(displayName);
 
@@ -107,5 +107,17 @@ export class SettingsUtils {
       AvailableOutputNames,
       outputs.map((id) => id.toString())
     );
+  }
+
+  connectToChanges(settingName: string, func: () => void): number {
+    return this.getSettings().connect(`changed::${settingName}`, func);
+  }
+
+  disconnect(subscriptionId: number) {
+    this.getSettings().disconnect(subscriptionId);
+  }
+
+  dispose() {
+    this.settings = null;
   }
 }

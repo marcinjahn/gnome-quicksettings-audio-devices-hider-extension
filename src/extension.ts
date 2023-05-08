@@ -1,4 +1,3 @@
-import { Settings } from "@gi-types/gio2";
 import { DisplayName } from "identification";
 import { delay } from "utils/delay";
 
@@ -9,11 +8,7 @@ import {
   MixerSubscription,
   MixerWrapper,
 } from "./mixer";
-import {
-  ExcludedOutputNamesSetting,
-  SettingsPath,
-  SettingsUtils,
-} from "./settings";
+import { ExcludedOutputNamesSetting, SettingsUtils } from "./settings";
 
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -22,7 +17,7 @@ class Extension {
   private _mixer: MixerWrapper | null;
   private _mixerSubscription: MixerSubscription | null;
   private _audioPanel: AudioPanel | null;
-  private _settings: Settings | null;
+  private _settings: SettingsUtils | null;
   private _settingsSubscription: number | null;
   private _lastExludedDevices: DisplayName[] | null;
 
@@ -34,8 +29,8 @@ class Extension {
     log(`Enabling extension ${this._uuid}`);
 
     this._audioPanel = new AudioPanel();
-    this._settings = ExtensionUtils.getSettings(SettingsPath);
-    this._lastExludedDevices = SettingsUtils.getExcludedOutputDeviceNames();
+    this._settings = new SettingsUtils();
+    this._lastExludedDevices = this._settings.getExcludedOutputDeviceNames();
 
     this._mixer = await new AudioPanelMixerSource().getMixer();
 
@@ -57,10 +52,11 @@ class Extension {
   }
 
   setupExludedDevicesHandling() {
-    this._settingsSubscription = this._settings!.connect(
-      `changed::${ExcludedOutputNamesSetting}`,
+    this._settingsSubscription = this._settings!.connectToChanges(
+      ExcludedOutputNamesSetting,
       () => {
-        const newExcludedDevices = SettingsUtils.getExcludedOutputDeviceNames();
+        const newExcludedDevices =
+          this._settings!.getExcludedOutputDeviceNames();
 
         const devicesToShowIds = this.getDeviceIdsToShow(newExcludedDevices);
         const devicesToHideIds = this.getDeviceIdsToHide(newExcludedDevices);
@@ -112,7 +108,7 @@ class Extension {
   hideDeviceIfExcluded(deviceId: number) {
     const deviceName = this._mixer!.getAudioDevicesFromIds([deviceId])[0]
       .displayName;
-    const excludedOutputs = SettingsUtils.getExcludedOutputDeviceNames();
+    const excludedOutputs = this._settings!.getExcludedOutputDeviceNames();
 
     if (excludedOutputs.includes(deviceName)) {
       delay(200).then(() => {
@@ -124,7 +120,7 @@ class Extension {
 
   setAllOutputsInSettings() {
     const allDisplayedDevices = this._audioPanel!.getDisplayedDevices();
-    SettingsUtils.setAvailableOutputs(
+    this._settings!.setAvailableOutputs(
       allDisplayedDevices.map((i) => i.displayName)
     );
   }
@@ -134,9 +130,9 @@ class Extension {
       .displayName;
 
     if (event.type === "output-added") {
-      SettingsUtils.addToAvailableOutputs(displayName);
+      this._settings!.addToAvailableOutputs(displayName);
     } else if (event.type === "output-removed") {
-      SettingsUtils.removeFromAvailableOutputs(displayName);
+      this._settings!.removeFromAvailableOutputs(displayName);
     } else {
       log(`WARN: Received an unsupported MixerEvent: ${event.type}`);
     }
@@ -153,19 +149,21 @@ class Extension {
     }
 
     this._settings!.disconnect(this._settingsSubscription!);
+    this._settingsSubscription = null;
 
     this.enableAllDevices();
 
+    this._settings!.dispose();
+
+    this._settings = null;
     this._audioPanel = null;
     this._lastExludedDevices = null;
     this._mixer = null;
     this._mixerSubscription = null;
-    this._settingsSubscription = null;
-    this._uuid = null;
   }
 
   enableAllDevices() {
-    const allDevices = SettingsUtils.getAvailableOutputs();
+    const allDevices = this._settings!.getAvailableOutputs();
     const devicesToShowIds = this._mixer!.getAudioDevicesFromDisplayNames(
       allDevices
     )
