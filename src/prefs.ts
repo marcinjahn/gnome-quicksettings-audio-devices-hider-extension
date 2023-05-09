@@ -14,12 +14,7 @@ function fillPreferencesWindow(window: PreferencesWindow) {
   const page = new PreferencesPage();
   window.add(page);
 
-  let settings: SettingsUtils | null = new SettingsUtils();
-
-  window.connect("close-request", () => {
-    settings?.dispose();
-    settings = null;
-  });
+  let settings = new SettingsUtils();
 
   const allDevices = settings.getAvailableOutputs();
   const hiddenDevices = settings.getExcludedOutputDeviceNames();
