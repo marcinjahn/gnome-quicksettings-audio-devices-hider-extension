@@ -44,7 +44,7 @@ class Extension {
     new AudioPanelMixerSource().getMixer().then((mixer) => {
       this._mixer = mixer;
 
-      this.setAllOutputsInSettings();
+      this.setAvailableDevicesInSettings();
       this.setupDeviceChangesSubscription();
       this.hideExcludedDevices();
       this.setupExcludedDevicesHandling();
@@ -186,7 +186,7 @@ class Extension {
     }
   }
 
-  setAllOutputsInSettings() {
+  setAvailableDevicesInSettings() {
     const allDisplayedOutputDevices =
       this._audioPanel!.getDisplayedDevices("output");
     const allDisplayedInputDevices =
