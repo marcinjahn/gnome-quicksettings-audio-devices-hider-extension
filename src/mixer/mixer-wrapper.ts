@@ -67,7 +67,7 @@ export class MixerWrapper {
       callback({ deviceId, type: "input-removed" })
     );
 
-    return { ids: [addOutputId, removeOutputId, addInputId, removeOutputId] };
+    return { ids: [addOutputId, removeOutputId, addInputId, removeInputId] };
   }
 
   unsubscribe(subscription: MixerSubscription) {
