@@ -11,21 +11,23 @@ import { DisplayName, DeviceType } from "identification";
 function init() {}
 
 function fillPreferencesWindow(window: PreferencesWindow) {
-  const page = new PreferencesPage();
-  window.add(page);
+  const settings = new SettingsUtils();
 
-  let settings = new SettingsUtils();
+  window.add(createOutputsPage(settings));
+  window.add(createInputsPage(settings));
+}
+
+function createOutputsPage(settings: SettingsUtils): PreferencesPage {
+  const page = new PreferencesPage({
+    title: "Outputs",
+    iconName: "audio-speakers-symbolic",
+  });
 
   const allOutputDevices = settings.getAvailableOutputs();
-  const allInputDevices = settings.getAvailableInputs();
   const hiddenOutputDevices = settings.getExcludedOutputDeviceNames();
-  const hiddenInputDevices = settings.getExcludedInputDeviceNames();
 
-  let visibleOutputDevices = allOutputDevices.filter(
+  const visibleOutputDevices = allOutputDevices.filter(
     (device) => !hiddenOutputDevices.includes(device)
-  );
-  let visibleInputDevices = allInputDevices.filter(
-    (device) => !hiddenInputDevices.includes(device)
   );
 
   const outputs = new PreferencesGroup({
@@ -42,6 +44,22 @@ function fillPreferencesWindow(window: PreferencesWindow) {
     outputs.add(createDeviceRow(device, false, settings!, "output"));
   });
 
+  return page;
+}
+
+function createInputsPage(settings: SettingsUtils): PreferencesPage {
+  const page = new PreferencesPage({
+    title: "Inputs",
+    iconName: "audio-input-microphone-symbolic",
+  });
+
+  const allInputDevices = settings.getAvailableInputs();
+  const hiddenInputDevices = settings.getExcludedInputDeviceNames();
+
+  const visibleInputDevices = allInputDevices.filter(
+    (device) => !hiddenInputDevices.includes(device)
+  );
+
   const inputs = new PreferencesGroup({
     title: "Input Audio Devices",
     description:
@@ -55,6 +73,8 @@ function fillPreferencesWindow(window: PreferencesWindow) {
   hiddenInputDevices.forEach((device) => {
     inputs.add(createDeviceRow(device, false, settings!, "input"));
   });
+
+  return page;
 }
 
 function createDeviceRow(
