@@ -1,5 +1,5 @@
 import { Settings } from "@gi-types/gio2";
-import { DisplayName, DeviceType } from "identification";
+import { DeviceType, DisplayName } from "identification";
 
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -8,6 +8,7 @@ const SettingsPath =
 
 export const ExcludedOutputNamesSetting = "excluded-output-names";
 export const ExcludedInputNamesSetting = "excluded-input-names";
+export const InputSliderAlwaysVisible = "input-slider-always-visible";
 const AvailableOutputNames = "available-output-names";
 const AvailableInputNames = "available-input-names";
 
@@ -24,15 +25,21 @@ export class SettingsUtils {
 
   getExcludedOutputDeviceNames(): DisplayName[] {
     const settings = this.getSettings();
-    const ids = settings.get_strv(ExcludedOutputNamesSetting);
-
-    return ids;
+    return settings.get_strv(ExcludedOutputNamesSetting);
   }
   getExcludedInputDeviceNames(): DisplayName[] {
     const settings = this.getSettings();
-    const ids = settings.get_strv(ExcludedInputNamesSetting);
+    return settings.get_strv(ExcludedInputNamesSetting);
+  }
 
-    return ids;
+  getInputSliderAlwaysVisible(): boolean {
+    const settings = this.getSettings();
+    return settings.get_boolean(InputSliderAlwaysVisible);
+  }
+
+  setInputSliderAlwaysVisible(visible: boolean) {
+    const settings = this.getSettings();
+    settings.set_boolean(InputSliderAlwaysVisible, visible);
   }
 
   setExcludedOutputDeviceNames(displayNames: DisplayName[]) {
@@ -89,16 +96,12 @@ export class SettingsUtils {
 
   getAvailableOutputs(): DisplayName[] {
     const settings = this.getSettings();
-    const ids = settings.get_strv(AvailableOutputNames);
-
-    return ids;
+    return settings.get_strv(AvailableOutputNames);
   }
 
   getAvailableInputs(): DisplayName[] {
     const settings = this.getSettings();
-    const ids = settings.get_strv(AvailableInputNames);
-
-    return ids;
+    return settings.get_strv(AvailableInputNames);
   }
 
   setAvailableOutputs(displayNames: DisplayName[]) {

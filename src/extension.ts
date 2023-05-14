@@ -11,10 +11,9 @@ import {
 import {
   ExcludedInputNamesSetting,
   ExcludedOutputNamesSetting,
+  InputSliderAlwaysVisible,
   SettingsUtils,
 } from "./settings";
-
-const ExtensionUtils = imports.misc.extensionUtils;
 
 class Extension {
   private _uuid: string | null;
@@ -24,6 +23,7 @@ class Extension {
   private _settings: SettingsUtils | null;
   private _outputSettingsSubscription: number | null;
   private _inputSettingsSubscription: number | null;
+  private _sliderAlwaysVisibleSettingsSubscription: number | null;
   private _lastExcludedOutputDevices: DisplayName[] | null;
   private _lastExcludedInputDevices: DisplayName[] | null;
 
@@ -46,6 +46,7 @@ class Extension {
 
       this.setAvailableDevicesInSettings();
       this.setupDeviceChangesSubscription();
+      this.showInputSliderIfNecessary();
       this.hideExcludedDevices();
       this.setupExcludedDevicesHandling();
     });
@@ -68,6 +69,14 @@ class Extension {
       if (device) {
         this._audioPanel!.removeDevice(device!.id, device.type);
       }
+    });
+  }
+
+  showInputSliderIfNecessary() {
+    delay(200).then(() => {
+      this._audioPanel?.showInputSlider(
+        this._settings?.getInputSliderAlwaysVisible()!
+      );
     });
   }
 
@@ -115,6 +124,12 @@ class Extension {
       ExcludedOutputNamesSetting,
       listenerFactory("output")
     );
+    this._sliderAlwaysVisibleSettingsSubscription =
+      this._settings!.connectToChanges(InputSliderAlwaysVisible, () => {
+        this._audioPanel?.showInputSlider(
+          this._settings?.getInputSliderAlwaysVisible()!
+        );
+      });
   }
 
   private getDeviceIdsToHide(
@@ -161,6 +176,8 @@ class Extension {
           this.hideDeviceIfExcluded(event.deviceId, "output");
         } else if (event.type === "input-added") {
           this.hideDeviceIfExcluded(event.deviceId, "input");
+        } else if (["stream-added", "stream-removed"].includes(event.type)) {
+          this.showInputSliderIfNecessary();
         }
       }) ?? null;
   }
@@ -239,6 +256,13 @@ class Extension {
       this._settings?.disconnect(this._inputSettingsSubscription!);
       this._inputSettingsSubscription = null;
     }
+
+    if (this._sliderAlwaysVisibleSettingsSubscription) {
+      this._settings?.disconnect(this._sliderAlwaysVisibleSettingsSubscription);
+      this._sliderAlwaysVisibleSettingsSubscription = null;
+    }
+
+    this._audioPanel?.showInputSlider(false);
 
     this.enableAllDevices();
 

@@ -19,5 +19,9 @@
       <default>[]</default>
       <description>Display names of all input devices that would normally be displayed in Gnome's Quick Settings input audio devices panel. It's refreshed every time extension is enabled.</description>
     </key>
+    <key name="input-slider-always-visible" type="b">
+      <default>false</default>
+      <description>Show input indicator even when input is not being used.</description>
+    </key>
   </schema>
 </schemalist>

@@ -17,6 +17,14 @@ export class AudioPanel {
     }));
   }
 
+  showInputSlider(visible: boolean) {
+    const InputVolumeSlider = QuickSettings._volume._input;
+    const InputVolumeIndicator = QuickSettings._volume._inputIndicator;
+
+    InputVolumeSlider.visible = visible || InputVolumeSlider._shouldBeVisible();
+    InputVolumeIndicator.visible = InputVolumeSlider._shouldBeVisible();
+  }
+
   removeDevice(id: number, type: DeviceType) {
     if (type === "output") {
       QuickSettings._volume._output._removeDevice(id);

@@ -74,7 +74,38 @@ function createInputsPage(settings: SettingsUtils): PreferencesPage {
     inputs.add(createDeviceRow(device, false, settings!, "input"));
   });
 
+  const sliderVisibility = new PreferencesGroup({
+    title: "Other",
+  });
+
+  page.add(sliderVisibility);
+  sliderVisibility.add(
+    createInputSliderVisibilityToggle("Always show input slider", settings)
+  );
+
   return page;
+}
+
+function createInputSliderVisibilityToggle(
+  title: string,
+  settings: SettingsUtils
+): ActionRow {
+  const row = new ActionRow({ title: title });
+
+  const toggle = new Switch({
+    active: settings.getInputSliderAlwaysVisible(),
+    valign: Align.CENTER,
+  });
+
+  toggle.connect("state-set", (_, state) => {
+    settings.setInputSliderAlwaysVisible(state);
+    return false;
+  });
+
+  row.add_suffix(toggle);
+  row.activatable_widget = toggle;
+
+  return row;
 }
 
 function createDeviceRow(

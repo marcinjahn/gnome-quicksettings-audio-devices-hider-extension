@@ -66,8 +66,23 @@ export class MixerWrapper {
     const removeInputId = this.mixer.connect("input-removed", (_, deviceId) =>
       callback({ deviceId, type: "input-removed" })
     );
+    const addStreamId = this.mixer.connect("stream-added", (_, deviceId) =>
+      callback({ deviceId, type: "stream-added" })
+    );
+    const removeStreamId = this.mixer.connect("stream-removed", (_, deviceId) =>
+      callback({ deviceId, type: "stream-removed" })
+    );
 
-    return { ids: [addOutputId, removeOutputId, addInputId, removeOutputId] };
+    return {
+      ids: [
+        addOutputId,
+        removeOutputId,
+        addInputId,
+        removeInputId,
+        addStreamId,
+        removeStreamId,
+      ],
+    };
   }
 
   unsubscribe(subscription: MixerSubscription) {

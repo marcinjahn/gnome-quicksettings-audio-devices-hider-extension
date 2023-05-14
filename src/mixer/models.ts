@@ -1,7 +1,11 @@
-import { DeviceType } from "../identification";
-
 export interface MixerEvent {
-  type: "output-added" | "output-removed" | "input-added" | "input-removed";
+  type:
+    | "output-added"
+    | "output-removed"
+    | "input-added"
+    | "input-removed"
+    | "stream-added"
+    | "stream-removed";
   deviceId: number;
 }
 
