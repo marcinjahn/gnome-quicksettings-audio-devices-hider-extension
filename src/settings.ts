@@ -50,7 +50,7 @@ export class SettingsUtils {
       return;
     }
 
-    const newOutputs = [...currentDevices, displayName];
+    const newDevices = [...currentDevices, displayName];
 
     const setting =
       deviceType === "output"
@@ -58,7 +58,7 @@ export class SettingsUtils {
         : ExcludedInputNamesSetting;
 
     const settings = this.getSettings();
-    settings.set_strv(setting, newOutputs);
+    settings.set_strv(setting, newDevices);
   }
 
   removeFromExcludedDeviceNames(
@@ -84,7 +84,7 @@ export class SettingsUtils {
         : ExcludedInputNamesSetting;
 
     const settings = this.getSettings();
-    settings.set_strv(deviceType, devices);
+    settings.set_strv(setting, devices);
   }
 
   getAvailableOutputs(): DisplayName[] {
@@ -127,12 +127,12 @@ export class SettingsUtils {
       return;
     }
 
-    const newAllOutputs = [...currentDevices, displayName];
+    const newAllDevices = [...currentDevices, displayName];
 
     const settings = this.getSettings();
     settings.set_strv(
       type === "output" ? AvailableOutputNames : AvailableInputNames,
-      newAllOutputs.map((id) => id.toString())
+      newAllDevices.map((id) => id.toString())
     );
   }
 

@@ -52,7 +52,7 @@ class Extension {
   }
 
   hideExcludedDevices() {
-    let devices = this._mixer
+    const devices = this._mixer
       ?.getAudioDevicesFromDisplayNames(
         this._lastExcludedOutputDevices!,
         "output"
@@ -265,7 +265,7 @@ class Extension {
       .forEach((id) => this._audioPanel!.addDevice(id, "output"));
 
     this._mixer
-      ?.getAudioDevicesFromDisplayNames(allOutputDevices, "input")
+      ?.getAudioDevicesFromDisplayNames(allInputDevices, "input")
       .filter((n) => n)
       .map((n) => n!.id)
       .forEach((id) => this._audioPanel!.addDevice(id, "input"));
