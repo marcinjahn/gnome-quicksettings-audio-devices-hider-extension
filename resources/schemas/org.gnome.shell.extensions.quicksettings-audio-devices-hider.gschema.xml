@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-  <schema id="org.gnome.shell.extensions.quicksettings-audio-devices-hider" 
+  <schema id="org.gnome.shell.extensions.quicksettings-audio-devices-hider"
           path="/org/gnome/shell/extensions/quicksettings-audio-devices-hider/">
     <!-- See also: https://docs.gtk.org/glib/gvariant-format-strings.html -->
     <key name="excluded-output-names" type="as">
@@ -10,6 +10,14 @@
     <key name="available-output-names" type="as">
       <default>[]</default>
       <description>Display names of all output devices that would normally be displayed in Gnome's Quick Settings output audio devices panel. It's refreshed every time extension is enabled.</description>
+    </key>
+    <key name="excluded-input-names" type="as">
+      <default>[]</default>
+      <description>Display names of audio inputs that should be hidden from the Gnome's Quick Settings input audio devices panel. It's persistent across reloads of the extensions</description>
+    </key>
+    <key name="available-input-names" type="as">
+      <default>[]</default>
+      <description>Display names of all input devices that would normally be displayed in Gnome's Quick Settings input audio devices panel. It's refreshed every time extension is enabled.</description>
     </key>
   </schema>
 </schemalist>

@@ -6,7 +6,7 @@ import {
   PreferencesWindow,
 } from "@gi-types/adw1";
 import { Switch, Align } from "@gi-types/gtk4";
-import { DisplayName } from "identification";
+import { DisplayName, DeviceType } from "identification";
 
 function init() {}
 
@@ -16,32 +16,52 @@ function fillPreferencesWindow(window: PreferencesWindow) {
 
   let settings = new SettingsUtils();
 
-  const allDevices = settings.getAvailableOutputs();
-  const hiddenDevices = settings.getExcludedOutputDeviceNames();
+  const allOutputDevices = settings.getAvailableOutputs();
+  const allInputDevices = settings.getAvailableInputs();
+  const hiddenOutputDevices = settings.getExcludedOutputDeviceNames();
+  const hiddenInputDevices = settings.getExcludedInputDeviceNames();
 
-  var visibleDevices = allDevices.filter(
-    (device) => !hiddenDevices.includes(device)
+  let visibleOutputDevices = allOutputDevices.filter(
+    (device) => !hiddenOutputDevices.includes(device)
+  );
+  let visibleInputDevices = allInputDevices.filter(
+    (device) => !hiddenInputDevices.includes(device)
   );
 
-  const group = new PreferencesGroup({
+  const outputs = new PreferencesGroup({
     title: "Output Audio Devices",
     description:
-      "Choose which devices should be visible in the Quick Setting panel",
+      "Choose which output devices should be visible in the Quick Setting panel",
   });
-  page.add(group);
+  page.add(outputs);
 
-  visibleDevices.forEach((device) => {
-    group.add(createDeviceRow(device, true, settings!));
+  visibleOutputDevices.forEach((device) => {
+    outputs.add(createDeviceRow(device, true, settings!, "output"));
   });
-  hiddenDevices.forEach((device) => {
-    group.add(createDeviceRow(device, false, settings!));
+  hiddenOutputDevices.forEach((device) => {
+    outputs.add(createDeviceRow(device, false, settings!, "output"));
+  });
+
+  const inputs = new PreferencesGroup({
+    title: "Input Audio Devices",
+    description:
+      "Choose which input devices should be visible in the Quick Setting panel",
+  });
+  page.add(inputs);
+
+  visibleInputDevices.forEach((device) => {
+    inputs.add(createDeviceRow(device, true, settings!, "input"));
+  });
+  hiddenInputDevices.forEach((device) => {
+    inputs.add(createDeviceRow(device, false, settings!, "input"));
   });
 }
 
 function createDeviceRow(
   displayName: DisplayName,
   active: boolean,
-  settings: SettingsUtils
+  settings: SettingsUtils,
+  type: DeviceType
 ): ActionRow {
   const row = new ActionRow({ title: displayName });
 
@@ -52,9 +72,9 @@ function createDeviceRow(
 
   toggle.connect("state-set", (_, state) => {
     if (state) {
-      settings.removeFromExcludedOutputDeviceNames(displayName);
+      settings.removeFromExcludedDeviceNames(displayName, type);
     } else {
-      settings.addToExcludedOutputDeviceNames(displayName);
+      settings.addToExcludedDeviceNames(displayName, type);
     }
 
     return false;

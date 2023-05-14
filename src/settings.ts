@@ -1,5 +1,5 @@
 import { Settings } from "@gi-types/gio2";
-import { DisplayName } from "identification/display-name";
+import { DisplayName, DeviceType } from "identification";
 
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -7,7 +7,9 @@ const SettingsPath =
   "org.gnome.shell.extensions.quicksettings-audio-devices-hider";
 
 export const ExcludedOutputNamesSetting = "excluded-output-names";
+export const ExcludedInputNamesSetting = "excluded-input-names";
 const AvailableOutputNames = "available-output-names";
+const AvailableInputNames = "available-input-names";
 
 export class SettingsUtils {
   private settings: Settings | null = null;
@@ -26,43 +28,75 @@ export class SettingsUtils {
 
     return ids;
   }
+  getExcludedInputDeviceNames(): DisplayName[] {
+    const settings = this.getSettings();
+    const ids = settings.get_strv(ExcludedInputNamesSetting);
+
+    return ids;
+  }
 
   setExcludedOutputDeviceNames(displayNames: DisplayName[]) {
     const settings = this.getSettings();
     settings.set_strv(ExcludedOutputNamesSetting, displayNames);
   }
 
-  addToExcludedOutputDeviceNames(displayName: DisplayName) {
-    const currentOutputs = this.getExcludedOutputDeviceNames();
+  addToExcludedDeviceNames(displayName: DisplayName, deviceType: DeviceType) {
+    const currentDevices =
+      deviceType === "output"
+        ? this.getExcludedOutputDeviceNames()
+        : this.getExcludedInputDeviceNames();
 
-    if (currentOutputs.includes(displayName)) {
+    if (currentDevices.includes(displayName)) {
       return;
     }
 
-    const newOutputs = [...currentOutputs, displayName];
-    const settings = this.getSettings();
+    const newOutputs = [...currentDevices, displayName];
 
-    settings.set_strv(ExcludedOutputNamesSetting, newOutputs);
+    const setting =
+      deviceType === "output"
+        ? ExcludedOutputNamesSetting
+        : ExcludedInputNamesSetting;
+
+    const settings = this.getSettings();
+    settings.set_strv(setting, newOutputs);
   }
 
-  removeFromExcludedOutputDeviceNames(displayName: DisplayName) {
-    const outputs = this.getExcludedOutputDeviceNames();
+  removeFromExcludedDeviceNames(
+    displayName: DisplayName,
+    deviceType: DeviceType
+  ) {
+    const devices =
+      deviceType === "output"
+        ? this.getExcludedOutputDeviceNames()
+        : this.getExcludedInputDeviceNames();
 
-    const index = outputs.indexOf(displayName);
+    const index = devices.indexOf(displayName);
 
     if (index === -1) {
       return;
     }
 
-    outputs.splice(index, 1);
+    devices.splice(index, 1);
+
+    const setting =
+      deviceType === "output"
+        ? ExcludedOutputNamesSetting
+        : ExcludedInputNamesSetting;
 
     const settings = this.getSettings();
-    settings.set_strv(ExcludedOutputNamesSetting, outputs);
+    settings.set_strv(deviceType, devices);
   }
 
   getAvailableOutputs(): DisplayName[] {
     const settings = this.getSettings();
     const ids = settings.get_strv(AvailableOutputNames);
+
+    return ids;
+  }
+
+  getAvailableInputs(): DisplayName[] {
+    const settings = this.getSettings();
+    const ids = settings.get_strv(AvailableInputNames);
 
     return ids;
   }
@@ -75,37 +109,51 @@ export class SettingsUtils {
     );
   }
 
-  addToAvailableOutputs(displayName: DisplayName) {
-    const currentOutputs = this.getAvailableOutputs();
+  setAvailableInputs(displayNames: DisplayName[]) {
+    const settings = this.getSettings();
+    settings.set_strv(
+      AvailableInputNames,
+      displayNames.map((id) => id.toString())
+    );
+  }
 
-    if (currentOutputs.includes(displayName)) {
+  addToAvailableDevices(displayName: DisplayName, type: DeviceType) {
+    const currentDevices =
+      type === "output"
+        ? this.getAvailableOutputs()
+        : this.getAvailableInputs();
+
+    if (currentDevices.includes(displayName)) {
       return;
     }
 
-    const newAllOutputs = [...currentOutputs, displayName];
+    const newAllOutputs = [...currentDevices, displayName];
 
     const settings = this.getSettings();
     settings.set_strv(
-      AvailableOutputNames,
+      type === "output" ? AvailableOutputNames : AvailableInputNames,
       newAllOutputs.map((id) => id.toString())
     );
   }
 
-  removeFromAvailableOutputs(displayName: DisplayName) {
-    const outputs = this.getAvailableOutputs();
+  removeFromAvailableDevices(displayName: DisplayName, type: DeviceType) {
+    const devices =
+      type === "output"
+        ? this.getAvailableOutputs()
+        : this.getAvailableInputs();
 
-    const index = outputs.indexOf(displayName);
+    const index = devices.indexOf(displayName);
 
     if (index === -1) {
       return;
     }
 
-    outputs.splice(index, 1);
+    devices.splice(index, 1);
 
     const settings = this.getSettings();
     settings.set_strv(
-      AvailableOutputNames,
-      outputs.map((id) => id.toString())
+      type === "output" ? AvailableOutputNames : AvailableInputNames,
+      devices.map((id) => id.toString())
     );
   }
 
