@@ -13,7 +13,7 @@ not going to ever choose anyway.
 
 ## Configuration
 
-The shown/hidden devices may be configured via preferences window
+The shown/hidden devices may be configured via preferences window.
 
 ### Output Devices
 
