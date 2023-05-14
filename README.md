@@ -15,7 +15,15 @@ not going to ever choose anyway.
 
 The shown/hidden devices may be configured via preferences window
 
-![Extension Preferences Window](./img/outputs-preferences.png)
+### Output Devices
+
+<img alt="Output Settings" src="https://github.com/marcinjahn/gnome-quicksettings-audio-devices-hider-extension/blob/main/img/outputs-preferences.png?raw=true" width="80%">
+
+### Input Devices
+
+<img alt="Input Settings" src="https://github.com/marcinjahn/gnome-quicksettings-audio-devices-hider-extension/blob/main/img/inputs-preferences.png?raw=true" width="80%">
+
+## Remarks
 
 Note that the extension does not disable the device in the system. All the devices
 are still going to be visible in the Control Panel. All this extension does is
