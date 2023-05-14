@@ -6,42 +6,82 @@ import {
   PreferencesWindow,
 } from "@gi-types/adw1";
 import { Switch, Align } from "@gi-types/gtk4";
-import { DisplayName } from "identification";
+import { DisplayName, DeviceType } from "identification";
 
 function init() {}
 
 function fillPreferencesWindow(window: PreferencesWindow) {
-  const page = new PreferencesPage();
-  window.add(page);
+  const settings = new SettingsUtils();
 
-  let settings = new SettingsUtils();
+  window.add(createOutputsPage(settings));
+  window.add(createInputsPage(settings));
+}
 
-  const allDevices = settings.getAvailableOutputs();
-  const hiddenDevices = settings.getExcludedOutputDeviceNames();
+function createOutputsPage(settings: SettingsUtils): PreferencesPage {
+  const page = new PreferencesPage({
+    title: "Outputs",
+    iconName: "audio-speakers-symbolic",
+  });
 
-  var visibleDevices = allDevices.filter(
-    (device) => !hiddenDevices.includes(device)
+  const allOutputDevices = settings.getAvailableOutputs();
+  const hiddenOutputDevices = settings.getExcludedOutputDeviceNames();
+
+  const visibleOutputDevices = allOutputDevices.filter(
+    (device) => !hiddenOutputDevices.includes(device)
   );
 
-  const group = new PreferencesGroup({
+  const outputs = new PreferencesGroup({
     title: "Output Audio Devices",
     description:
-      "Choose which devices should be visible in the Quick Setting panel",
+      "Choose which output devices should be visible in the Quick Setting panel",
   });
-  page.add(group);
+  page.add(outputs);
 
-  visibleDevices.forEach((device) => {
-    group.add(createDeviceRow(device, true, settings!));
+  visibleOutputDevices.forEach((device) => {
+    outputs.add(createDeviceRow(device, true, settings!, "output"));
   });
-  hiddenDevices.forEach((device) => {
-    group.add(createDeviceRow(device, false, settings!));
+  hiddenOutputDevices.forEach((device) => {
+    outputs.add(createDeviceRow(device, false, settings!, "output"));
   });
+
+  return page;
+}
+
+function createInputsPage(settings: SettingsUtils): PreferencesPage {
+  const page = new PreferencesPage({
+    title: "Inputs",
+    iconName: "audio-input-microphone-symbolic",
+  });
+
+  const allInputDevices = settings.getAvailableInputs();
+  const hiddenInputDevices = settings.getExcludedInputDeviceNames();
+
+  const visibleInputDevices = allInputDevices.filter(
+    (device) => !hiddenInputDevices.includes(device)
+  );
+
+  const inputs = new PreferencesGroup({
+    title: "Input Audio Devices",
+    description:
+      "Choose which input devices should be visible in the Quick Setting panel",
+  });
+  page.add(inputs);
+
+  visibleInputDevices.forEach((device) => {
+    inputs.add(createDeviceRow(device, true, settings!, "input"));
+  });
+  hiddenInputDevices.forEach((device) => {
+    inputs.add(createDeviceRow(device, false, settings!, "input"));
+  });
+
+  return page;
 }
 
 function createDeviceRow(
   displayName: DisplayName,
   active: boolean,
-  settings: SettingsUtils
+  settings: SettingsUtils,
+  type: DeviceType
 ): ActionRow {
   const row = new ActionRow({ title: displayName });
 
@@ -52,9 +92,9 @@ function createDeviceRow(
 
   toggle.connect("state-set", (_, state) => {
     if (state) {
-      settings.removeFromExcludedOutputDeviceNames(displayName);
+      settings.removeFromExcludedDeviceNames(displayName, type);
     } else {
-      settings.addToExcludedOutputDeviceNames(displayName);
+      settings.addToExcludedDeviceNames(displayName, type);
     }
 
     return false;
