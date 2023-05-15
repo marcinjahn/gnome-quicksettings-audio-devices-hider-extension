@@ -35,5 +35,5 @@ extension. Its option to "Always show microphone volume slider" might not work
 when Quick Settings Audio Devices Hider is enabled. A workaround could be to
 install [[QSTweak] Quick Setting
 Tweaker](https://extensions.gnome.org/extension/5446/quick-settings-tweaker/),
-which has a similar functinality under the toggle "Always show input" under
-"Input/Output" tab.
+which has a similar functionality under the toggle "Always show input" under
+the "Input/Output" tab.
