@@ -16,12 +16,11 @@ export function getAudioDevice(
   origin: string | null,
   type: DeviceType
 ): AudioDevice {
-  if (!description) description = "unknown description";
-  if (!origin) origin = "unknown origin";
+  if (!description) description = "unknown device";
 
   return {
     id,
-    displayName: `${description} – ${origin}`,
+    displayName: origin ? `${description} – ${origin}` : description,
     type,
   };
 }
