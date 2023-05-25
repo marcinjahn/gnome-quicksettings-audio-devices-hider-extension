@@ -4,17 +4,13 @@ const Main = imports.ui.main;
 const QuickSettings = Main.panel.statusArea.quickSettings;
 
 export class AudioPanel {
-  getDisplayedDevices(type: DeviceType): AudioDevice[] {
+  getDisplayedDeviceIds(type: DeviceType): number[] {
     const devices =
       type === "output"
         ? QuickSettings._volume._output._deviceItems
         : QuickSettings._volume._input._deviceItems;
 
-    return Array.from(devices, ([id, value]) => ({
-      id,
-      displayName: value.label.get_text() as string,
-      type: type,
-    }));
+    return Array.from(devices, ([id]) => id);
   }
 
   removeDevice(id: number, type: DeviceType) {

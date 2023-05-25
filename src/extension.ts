@@ -187,16 +187,21 @@ class Extension {
   }
 
   setAvailableDevicesInSettings() {
-    const allDisplayedOutputDevices =
-      this._audioPanel!.getDisplayedDevices("output");
-    const allDisplayedInputDevices =
-      this._audioPanel!.getDisplayedDevices("input");
-    this._settings!.setAvailableOutputs(
-      allDisplayedOutputDevices.map((i) => i.displayName)
-    );
-    this._settings!.setAvailableInputs(
-      allDisplayedInputDevices.map((i) => i.displayName)
-    );
+    const allOutputIds = this._audioPanel!.getDisplayedDeviceIds("output");
+    const allOutputNames = this._mixer
+      ?.getAudioDevicesFromIds(allOutputIds, "output")
+      ?.map(({ displayName }) => displayName);
+    if (allOutputNames) {
+      this._settings!.setAvailableOutputs(allOutputNames);
+    }
+
+    const allInputIds = this._audioPanel!.getDisplayedDeviceIds("input");
+    const allInputNames = this._mixer
+      ?.getAudioDevicesFromIds(allInputIds, "input")
+      ?.map(({ displayName }) => displayName);
+    if (allInputNames) {
+      this._settings!.setAvailableInputs(allInputNames);
+    }
   }
 
   updateAvailableDevicesInSettings(event: MixerEvent) {
