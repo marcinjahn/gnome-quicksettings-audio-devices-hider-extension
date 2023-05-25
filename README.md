@@ -37,3 +37,7 @@ install [[QSTweak] Quick Setting
 Tweaker](https://extensions.gnome.org/extension/5446/quick-settings-tweaker/),
 which has a similar functionality under the toggle "Always show input" under
 the "Input/Output" tab.
+
+## Mentions
+
+- [OMG! Ubuntu](https://www.omgubuntu.co.uk/2023/05/hide-audio-devices-gnome-quick-settings)
