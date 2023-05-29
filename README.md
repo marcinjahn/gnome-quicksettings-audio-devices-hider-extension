@@ -1,4 +1,4 @@
-# Quick Settings Audio Devices Hider Gnome Extension
+# <img width="32px" src="./img/icon-128.webp" alt="project icon" /> Quick Settings Audio Devices Hider Gnome Extension
 
 <a href="https://extensions.gnome.org/extension/5964/quick-settings-audio-devices-hider/">
 <img src="https://raw.githubusercontent.com/marcinjahn/gnome-quicksettings-audio-devices-hider-extension/8e9404e349a0cf6c235cf69394a6292c6eef4cae/img/get-it-on-ego.svg" height="100" alt="Get it on GNOME Extensions"/>
