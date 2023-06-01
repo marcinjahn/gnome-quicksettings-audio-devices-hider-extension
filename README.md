@@ -9,7 +9,7 @@ not need in the Quick Settings Audio Panel. It supports both output and input de
 between your audio devices when the panel is decluttered from the entries you're
 not going to ever choose anyway.
 
-![Gnome Outputs in Quick Settings](./img/audio-panel.png)
+![Gnome Outputs in Quick Settings](./img/audio-panel.webp)
 
 ## Configuration
 
