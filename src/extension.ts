@@ -66,7 +66,7 @@ class Extension {
 
     devices?.forEach((device) => {
       if (device) {
-        this._audioPanel!.removeDevice(device!.id, device.type);
+        this._audioPanel?.removeDevice(device!.id, device.type);
       }
     });
   }
@@ -166,7 +166,7 @@ class Extension {
   }
 
   hideDeviceIfExcluded(deviceId: number, type: DeviceType) {
-    if (!this._mixer) {
+    if (!this._mixer || !this._settings) {
       return;
     }
 
@@ -175,37 +175,41 @@ class Extension {
 
     const excludedDevices =
       type === "output"
-        ? this._settings?.getExcludedOutputDeviceNames()
-        : this._settings?.getExcludedInputDeviceNames();
+        ? this._settings.getExcludedOutputDeviceNames()
+        : this._settings.getExcludedInputDeviceNames();
 
-    if (excludedDevices?.includes(deviceName)) {
-      delay(200).then(() => {
+    if (excludedDevices.includes(deviceName)) {
+      delay(300).then(() => {
         // delay due to potential race condition with Quick Setting panel's code
-        this._audioPanel!.removeDevice(deviceId, type);
+        this._audioPanel?.removeDevice(deviceId, type);
       });
     }
   }
 
   setAvailableDevicesInSettings() {
-    const allOutputIds = this._audioPanel!.getDisplayedDeviceIds("output");
-    const allOutputNames = this._mixer
-      ?.getAudioDevicesFromIds(allOutputIds, "output")
-      ?.map(({ displayName }) => displayName);
-    if (allOutputNames) {
-      this._settings!.setAvailableOutputs(allOutputNames);
+    if (!this._audioPanel || !this._mixer || !this._settings) {
+      return;
     }
 
-    const allInputIds = this._audioPanel!.getDisplayedDeviceIds("input");
+    const allOutputIds = this._audioPanel.getDisplayedDeviceIds("output");
+    const allOutputNames = this._mixer
+      .getAudioDevicesFromIds(allOutputIds, "output")
+      ?.map(({ displayName }) => displayName);
+    if (allOutputNames) {
+      this._settings.setAvailableOutputs(allOutputNames);
+    }
+
+    const allInputIds = this._audioPanel.getDisplayedDeviceIds("input");
     const allInputNames = this._mixer
-      ?.getAudioDevicesFromIds(allInputIds, "input")
+      .getAudioDevicesFromIds(allInputIds, "input")
       ?.map(({ displayName }) => displayName);
     if (allInputNames) {
-      this._settings!.setAvailableInputs(allInputNames);
+      this._settings.setAvailableInputs(allInputNames);
     }
   }
 
   updateAvailableDevicesInSettings(event: MixerEvent) {
-    if (!this._mixer) {
+    if (!this._mixer || !this._settings) {
       return;
     }
 
@@ -219,9 +223,9 @@ class Extension {
     )[0].displayName;
 
     if (["output-added", "input-added"].includes(event.type)) {
-      this._settings!.addToAvailableDevices(displayName, deviceType);
+      this._settings.addToAvailableDevices(displayName, deviceType);
     } else if (["output-removed", "input-removed"].includes(event.type)) {
-      this._settings!.removeFromAvailableDevices(displayName, deviceType);
+      this._settings.removeFromAvailableDevices(displayName, deviceType);
     } else {
       log(`WARN: Received an unsupported MixerEvent: ${event.type}`);
     }
@@ -260,20 +264,24 @@ class Extension {
   }
 
   enableAllDevices() {
-    const allOutputDevices = this._settings!.getAvailableOutputs();
-    const allInputDevices = this._settings!.getAvailableInputs();
+    if (!this._settings || !this._mixer) {
+      return;
+    }
+
+    const allOutputDevices = this._settings.getAvailableOutputs();
+    const allInputDevices = this._settings.getAvailableInputs();
 
     this._mixer
-      ?.getAudioDevicesFromDisplayNames(allOutputDevices, "output")
+      .getAudioDevicesFromDisplayNames(allOutputDevices, "output")
       .filter((n) => n)
       .map((n) => n!.id)
-      .forEach((id) => this._audioPanel!.addDevice(id, "output"));
+      .forEach((id) => this._audioPanel?.addDevice(id, "output"));
 
     this._mixer
-      ?.getAudioDevicesFromDisplayNames(allInputDevices, "input")
+      .getAudioDevicesFromDisplayNames(allInputDevices, "input")
       .filter((n) => n)
       .map((n) => n!.id)
-      .forEach((id) => this._audioPanel!.addDevice(id, "input"));
+      .forEach((id) => this._audioPanel?.addDevice(id, "input"));
   }
 }
 
