@@ -4,5 +4,5 @@
   "uuid": "quicksettings-audio-devices-hider@marcinjahn.com",
   "shell-version": ["43", "44"],
   "url": "https://github.com/marcinjahn/gnome-quicksettings-audio-devices-hider-extension",
-  "version": 9
+  "version": 10
 }
