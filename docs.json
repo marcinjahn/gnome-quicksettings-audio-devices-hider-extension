@@ -1,0 +1,20 @@
+{
+  "options": {
+    "inferGenerics": true,
+    "promisify": true,
+    "propertyCase": "underscore",
+    "versionedOutput": true,
+    "versionedImports": true,
+    "noAdvancedVariants": true,
+    "withDocs": true,
+    "importPrefix": "./",
+    "out": "./@gi-ts"
+  },
+  "libraries": {
+    "GObject": ["2.0"],
+    "GLib": ["2.0"],
+    "Gio": ["2.0"],
+    "Gtk": ["4.0"],
+    "Adw": ["1"]
+  }
+}

@@ -1,6 +1,7 @@
+import { Extension } from "gnomejs://extension.js";
+
 import { DeviceType, DisplayName } from "identification";
 import { delay, disposeDelayTimeouts } from "utils/delay";
-
 import { AudioPanel } from "./audio-panel";
 import {
   AudioPanelMixerSource,
@@ -11,35 +12,29 @@ import {
 import {
   ExcludedInputNamesSetting,
   ExcludedOutputNamesSetting,
+  SettingsPath,
   SettingsUtils,
 } from "./settings";
 
-const ExtensionUtils = imports.misc.extensionUtils;
-
-class Extension {
-  private _uuid: string | null;
+export default class QuickSettingsAudioDevicesHiderExtension extends Extension {
   private _mixer: MixerWrapper | null;
   private _mixerSubscription: MixerSubscription | null;
   private _audioPanel: AudioPanel | null;
-  private _settings: SettingsUtils | null;
+  private _settingsUtils: SettingsUtils | null;
   private _outputSettingsSubscription: number | null;
   private _inputSettingsSubscription: number | null;
   private _lastExcludedOutputDevices: DisplayName[] | null;
   private _lastExcludedInputDevices: DisplayName[] | null;
 
-  constructor(uuid: string) {
-    this._uuid = uuid;
-  }
-
   enable() {
-    log(`Enabling extension ${this._uuid}`);
+    log(`Enabling extension ${this.uuid}`);
 
     this._audioPanel = new AudioPanel();
-    this._settings = new SettingsUtils();
+    this._settingsUtils = new SettingsUtils(this.getSettings(SettingsPath));
     this._lastExcludedOutputDevices =
-      this._settings.getExcludedOutputDeviceNames();
+      this._settingsUtils.getExcludedOutputDeviceNames();
     this._lastExcludedInputDevices =
-      this._settings.getExcludedInputDeviceNames();
+      this._settingsUtils.getExcludedInputDeviceNames();
 
     new AudioPanelMixerSource().getMixer().then((mixer) => {
       this._mixer = mixer;
@@ -76,8 +71,8 @@ class Extension {
       return () => {
         const newExcludedDevices =
           type === "output"
-            ? this._settings?.getExcludedOutputDeviceNames()
-            : this._settings?.getExcludedInputDeviceNames();
+            ? this._settingsUtils?.getExcludedOutputDeviceNames()
+            : this._settingsUtils?.getExcludedInputDeviceNames();
 
         if (!newExcludedDevices) {
           return;
@@ -107,11 +102,11 @@ class Extension {
       };
     };
 
-    this._inputSettingsSubscription = this._settings!.connectToChanges(
+    this._inputSettingsSubscription = this._settingsUtils!.connectToChanges(
       ExcludedInputNamesSetting,
       listenerFactory("input")
     );
-    this._outputSettingsSubscription = this._settings!.connectToChanges(
+    this._outputSettingsSubscription = this._settingsUtils!.connectToChanges(
       ExcludedOutputNamesSetting,
       listenerFactory("output")
     );
@@ -166,7 +161,7 @@ class Extension {
   }
 
   hideDeviceIfExcluded(deviceId: number, type: DeviceType) {
-    if (!this._mixer || !this._settings) {
+    if (!this._mixer || !this._settingsUtils) {
       return;
     }
 
@@ -175,8 +170,8 @@ class Extension {
 
     const excludedDevices =
       type === "output"
-        ? this._settings.getExcludedOutputDeviceNames()
-        : this._settings.getExcludedInputDeviceNames();
+        ? this._settingsUtils.getExcludedOutputDeviceNames()
+        : this._settingsUtils.getExcludedInputDeviceNames();
 
     if (excludedDevices.includes(deviceName)) {
       delay(300).then(() => {
@@ -187,7 +182,7 @@ class Extension {
   }
 
   setAvailableDevicesInSettings() {
-    if (!this._audioPanel || !this._mixer || !this._settings) {
+    if (!this._audioPanel || !this._mixer || !this._settingsUtils) {
       return;
     }
 
@@ -196,7 +191,7 @@ class Extension {
       .getAudioDevicesFromIds(allOutputIds, "output")
       ?.map(({ displayName }) => displayName);
     if (allOutputNames) {
-      this._settings.setAvailableOutputs(allOutputNames);
+      this._settingsUtils.setAvailableOutputs(allOutputNames);
     }
 
     const allInputIds = this._audioPanel.getDisplayedDeviceIds("input");
@@ -204,12 +199,12 @@ class Extension {
       .getAudioDevicesFromIds(allInputIds, "input")
       ?.map(({ displayName }) => displayName);
     if (allInputNames) {
-      this._settings.setAvailableInputs(allInputNames);
+      this._settingsUtils.setAvailableInputs(allInputNames);
     }
   }
 
   updateAvailableDevicesInSettings(event: MixerEvent) {
-    if (!this._mixer || !this._settings) {
+    if (!this._mixer || !this._settingsUtils) {
       return;
     }
 
@@ -223,16 +218,16 @@ class Extension {
     )[0].displayName;
 
     if (["output-added", "input-added"].includes(event.type)) {
-      this._settings.addToAvailableDevices(displayName, deviceType);
+      this._settingsUtils.addToAvailableDevices(displayName, deviceType);
     } else if (["output-removed", "input-removed"].includes(event.type)) {
-      this._settings.removeFromAvailableDevices(displayName, deviceType);
+      this._settingsUtils.removeFromAvailableDevices(displayName, deviceType);
     } else {
       log(`WARN: Received an unsupported MixerEvent: ${event.type}`);
     }
   }
 
   disable() {
-    log(`Disabling extension ${this._uuid}`);
+    log(`Disabling extension ${this.uuid}`);
 
     if (this._mixerSubscription) {
       this._mixer?.unsubscribe(this._mixerSubscription);
@@ -240,12 +235,12 @@ class Extension {
     this._mixer?.dispose();
 
     if (this._outputSettingsSubscription) {
-      this._settings?.disconnect(this._outputSettingsSubscription!);
+      this._settingsUtils?.disconnect(this._outputSettingsSubscription!);
       this._outputSettingsSubscription = null;
     }
 
     if (this._inputSettingsSubscription) {
-      this._settings?.disconnect(this._inputSettingsSubscription!);
+      this._settingsUtils?.disconnect(this._inputSettingsSubscription!);
       this._inputSettingsSubscription = null;
     }
 
@@ -253,9 +248,7 @@ class Extension {
 
     disposeDelayTimeouts();
 
-    this._settings?.dispose();
-
-    this._settings = null;
+    this._settingsUtils = null;
     this._audioPanel = null;
     this._lastExcludedOutputDevices = null;
     this._lastExcludedInputDevices = null;
@@ -264,12 +257,12 @@ class Extension {
   }
 
   enableAllDevices() {
-    if (!this._settings || !this._mixer) {
+    if (!this._settingsUtils || !this._mixer) {
       return;
     }
 
-    const allOutputDevices = this._settings.getAvailableOutputs();
-    const allInputDevices = this._settings.getAvailableInputs();
+    const allOutputDevices = this._settingsUtils.getAvailableOutputs();
+    const allInputDevices = this._settingsUtils.getAvailableInputs();
 
     this._mixer
       .getAudioDevicesFromDisplayNames(allOutputDevices, "output")
@@ -283,8 +276,4 @@ class Extension {
       .map((n) => n!.id)
       .forEach((id) => this._audioPanel?.addDevice(id, "input"));
   }
-}
-
-export default function (meta: { uuid: string }): Extension {
-  return new Extension(meta.uuid);
 }

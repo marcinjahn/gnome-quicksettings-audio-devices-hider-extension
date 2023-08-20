@@ -1,4 +1,5 @@
-import { MixerControl, MixerUIDevice } from "@gi-types/gvc1";
+import Gvc from "@gi-types/gvc1";
+
 import { AudioDevice, DeviceType } from "../identification";
 import { MixerEvent, MixerSubscription } from "./models";
 import { range } from "utils/array";
@@ -6,7 +7,7 @@ import { getAudioDevice } from "identification/converters";
 import { DisplayName } from "identification/display-name";
 
 export class MixerWrapper {
-  constructor(private mixer: MixerControl, private disposal: () => void) {}
+  constructor(private mixer: Gvc.MixerControl, private disposal: () => void) {}
 
   getAudioDevicesFromIds(
     ids: number[],
@@ -39,7 +40,7 @@ export class MixerWrapper {
     displayNames: DisplayName[],
     type: DeviceType
   ): (AudioDevice | undefined)[] {
-    const dummyDevice = new MixerUIDevice();
+    const dummyDevice = new Gvc.MixerUIDevice();
 
     const devices = this.getAudioDevicesFromIds(
       range(dummyDevice.get_id()),

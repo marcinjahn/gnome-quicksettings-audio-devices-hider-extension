@@ -1,9 +1,7 @@
-import { Settings } from "@gi-types/gio2";
+import Gio from "@gi-ts/gio2";
 import { DisplayName, DeviceType } from "identification";
 
-const ExtensionUtils = imports.misc.extensionUtils;
-
-const SettingsPath =
+export const SettingsPath =
   "org.gnome.shell.extensions.quicksettings-audio-devices-hider";
 
 export const ExcludedOutputNamesSetting = "excluded-output-names";
@@ -12,32 +10,25 @@ const AvailableOutputNames = "available-output-names";
 const AvailableInputNames = "available-input-names";
 
 export class SettingsUtils {
-  private settings: Settings | null = null;
+  private settings: Gio.Settings;
 
-  private getSettings(): Settings {
-    if (!this.settings) {
-      this.settings = ExtensionUtils.getSettings(SettingsPath);
-    }
-
-    return this.settings;
+  constructor(settings: Gio.Settings) {
+    this.settings = settings;
   }
 
   getExcludedOutputDeviceNames(): DisplayName[] {
-    const settings = this.getSettings();
-    const ids = settings.get_strv(ExcludedOutputNamesSetting);
+    const ids = this.settings.get_strv(ExcludedOutputNamesSetting);
 
     return ids;
   }
   getExcludedInputDeviceNames(): DisplayName[] {
-    const settings = this.getSettings();
-    const ids = settings.get_strv(ExcludedInputNamesSetting);
+    const ids = this.settings.get_strv(ExcludedInputNamesSetting);
 
     return ids;
   }
 
   setExcludedOutputDeviceNames(displayNames: DisplayName[]) {
-    const settings = this.getSettings();
-    settings.set_strv(ExcludedOutputNamesSetting, displayNames);
+    this.settings.set_strv(ExcludedOutputNamesSetting, displayNames);
   }
 
   addToExcludedDeviceNames(displayName: DisplayName, deviceType: DeviceType) {
@@ -57,8 +48,7 @@ export class SettingsUtils {
         ? ExcludedOutputNamesSetting
         : ExcludedInputNamesSetting;
 
-    const settings = this.getSettings();
-    settings.set_strv(setting, newDevices);
+    this.settings.set_strv(setting, newDevices);
   }
 
   removeFromExcludedDeviceNames(
@@ -83,35 +73,30 @@ export class SettingsUtils {
         ? ExcludedOutputNamesSetting
         : ExcludedInputNamesSetting;
 
-    const settings = this.getSettings();
-    settings.set_strv(setting, devices);
+    this.settings.set_strv(setting, devices);
   }
 
   getAvailableOutputs(): DisplayName[] {
-    const settings = this.getSettings();
-    const ids = settings.get_strv(AvailableOutputNames);
+    const ids = this.settings.get_strv(AvailableOutputNames);
 
     return ids;
   }
 
   getAvailableInputs(): DisplayName[] {
-    const settings = this.getSettings();
-    const ids = settings.get_strv(AvailableInputNames);
+    const ids = this.settings.get_strv(AvailableInputNames);
 
     return ids;
   }
 
   setAvailableOutputs(displayNames: DisplayName[]) {
-    const settings = this.getSettings();
-    settings.set_strv(
+    this.settings.set_strv(
       AvailableOutputNames,
       displayNames.map((id) => id.toString())
     );
   }
 
   setAvailableInputs(displayNames: DisplayName[]) {
-    const settings = this.getSettings();
-    settings.set_strv(
+    this.settings.set_strv(
       AvailableInputNames,
       displayNames.map((id) => id.toString())
     );
@@ -129,8 +114,7 @@ export class SettingsUtils {
 
     const newAllDevices = [...currentDevices, displayName];
 
-    const settings = this.getSettings();
-    settings.set_strv(
+    this.settings.set_strv(
       type === "output" ? AvailableOutputNames : AvailableInputNames,
       newAllDevices.map((id) => id.toString())
     );
@@ -150,22 +134,17 @@ export class SettingsUtils {
 
     devices.splice(index, 1);
 
-    const settings = this.getSettings();
-    settings.set_strv(
+    this.settings.set_strv(
       type === "output" ? AvailableOutputNames : AvailableInputNames,
       devices.map((id) => id.toString())
     );
   }
 
   connectToChanges(settingName: string, func: () => void): number {
-    return this.getSettings().connect(`changed::${settingName}`, func);
+    return this.settings.connect(`changed::${settingName}`, func);
   }
 
   disconnect(subscriptionId: number) {
-    this.getSettings().disconnect(subscriptionId);
-  }
-
-  dispose() {
-    this.settings = null;
+    this.settings.disconnect(subscriptionId);
   }
 }

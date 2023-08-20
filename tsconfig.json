@@ -3,7 +3,9 @@
     "lib": ["ES2021"],
     "target": "ES2021",
     "strict": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
     "strictNullChecks": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
@@ -12,8 +14,9 @@
     "baseUrl": "./src/",
     "moduleResolution": "Node",
     "experimentalDecorators": true,
+    "esModuleInterop": true,
     "paths": {
-      "@imports/*": ["../@types/*"]
+      "@gi-ts/*": ["../@gi-ts/*"]
     }
   },
   "exclude": ["./dist"]
