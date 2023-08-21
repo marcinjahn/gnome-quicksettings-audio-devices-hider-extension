@@ -27,7 +27,7 @@ export default class QuickSettingsAudioDevicesHiderExtension extends Extension {
   private _lastExcludedInputDevices: DisplayName[] | null;
 
   enable() {
-    log(`Enabling extension ${this.uuid}`);
+    console.log(`Enabling extension ${this.uuid}`);
 
     this._audioPanel = new AudioPanel();
     this._settingsUtils = new SettingsUtils(this.getSettings(SettingsPath));
@@ -222,12 +222,12 @@ export default class QuickSettingsAudioDevicesHiderExtension extends Extension {
     } else if (["output-removed", "input-removed"].includes(event.type)) {
       this._settingsUtils.removeFromAvailableDevices(displayName, deviceType);
     } else {
-      log(`WARN: Received an unsupported MixerEvent: ${event.type}`);
+      console.warn(`Received an unsupported MixerEvent: ${event.type}`);
     }
   }
 
   disable() {
-    log(`Disabling extension ${this.uuid}`);
+    console.log(`Disabling extension ${this.uuid}`);
 
     if (this._mixerSubscription) {
       this._mixer?.unsubscribe(this._mixerSubscription);
