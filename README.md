@@ -12,7 +12,7 @@ not going to ever choose anyway.
 ![Gnome Outputs in Quick Settings](./img/audio-panel.webp)
 
 > [!TIP]
-> Try also the [Quick Settings Audio Devices Renamer](https://github.com/marcinjahn/gnome-quicksettings-audio-devices-renamer-extension)!
+> Also try the [Quick Settings Audio Devices Renamer](https://github.com/marcinjahn/gnome-quicksettings-audio-devices-renamer-extension) extension!
 
 ## Configuration
 
