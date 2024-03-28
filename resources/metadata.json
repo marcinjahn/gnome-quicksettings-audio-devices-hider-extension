@@ -2,7 +2,7 @@
   "name": "Quick Settings Audio Devices Hider",
   "description": "A Gnome Shell extension that allows you to hide selected output/input devices from the Quick Settings audio devices panel.\nThanks to it, your Quick Settings panel will list only those devices that you actually use making it easier to quickly switch between them.\n\nNote that this extension does not play well with the https://extensions.gnome.org/extension/5940/quick-settings-audio-panel/ extension. Its option to\"Always show microphone volume slider\" might not work when Quick Settings Audio Devices Hider is enabled. A workaround could be to install https://extensions.gnome.org/extension/5446/quick-settings-tweaker/, which has a similar functinality under the toggle \"Always show input\" under \"Input/Output\" tab.\n\nCheck out the https://extensions.gnome.org/extension/6000/quick-settings-audio-devices-renamer/ if you'd rather want to rename some device than hide it.",
   "uuid": "quicksettings-audio-devices-hider@marcinjahn.com",
-  "shell-version": ["45"],
+  "shell-version": ["46"],
   "url": "https://github.com/marcinjahn/gnome-quicksettings-audio-devices-hider-extension",
   "version": 12
 }
