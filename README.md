@@ -62,15 +62,6 @@ Note that the extension does not disable the device in the system. All the devic
 are still going to be visible in the Control Panel. All this extension does is
 to hide the unneeded devices from the Quick Settings panel.
 
-This extension does not play well with the [Quick Settings Audio
-Panel](https://extensions.gnome.org/extension/5940/quick-settings-audio-panel/)
-extension. Its option to "Always show microphone volume slider" might not work
-when Quick Settings Audio Devices Hider is enabled. A workaround could be to
-install [[QSTweak] Quick Setting
-Tweaker](https://extensions.gnome.org/extension/5446/quick-settings-tweaker/),
-which has a similar functionality under the toggle "Always show input" under
-the "Input/Output" tab.
-
 ## Mentions
 
 - [OMG! Ubuntu](https://www.omgubuntu.co.uk/2023/05/hide-audio-devices-gnome-quick-settings)
